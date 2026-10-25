@@ -35,11 +35,16 @@ interface StudioShellProps {
 
 export function StudioShell({ user, workspace, role, children }: StudioShellProps) {
   const isPro = useProStatus(workspace?.planId);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const [isUpgradeOpen, setIsUpgradeOpen] = useState(false);
   const [isStudiosOpen, setIsStudiosOpen] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Global Tool Search State
   const [toolSearch, setToolSearch] = useState("");
@@ -269,7 +274,7 @@ export function StudioShell({ user, workspace, role, children }: StudioShellProp
 
           {/* Pro Status in Sidebar */}
           <div className="pt-2 mt-auto">
-            {isPro ? (
+            {mounted && isPro ? (
               <div className="relative rounded-2xl bg-gradient-to-br from-[#1b2848] via-[#121c38] to-[#0a1122] border border-amber-400/40 p-4 text-white overflow-hidden shadow-lg">
                 <div className="flex items-center gap-2 mb-1.5">
                   <div className="w-6 h-6 rounded-lg bg-gradient-to-tr from-amber-400 to-amber-500 text-slate-950 flex items-center justify-center font-black shadow-xs">

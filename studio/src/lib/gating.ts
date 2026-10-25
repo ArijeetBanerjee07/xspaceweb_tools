@@ -534,18 +534,8 @@ export function useProStatus(initialPlanId?: string): boolean {
     ? ws.isPro || (Boolean(ws.workspace?.planId) && ws.workspace.planId !== "free")
     : false;
 
-  const [isPro, setIsPro] = useState<boolean>(() => {
-    if (contextIsPro) return true;
-    if (initialPlanId && initialPlanId !== "free") return true;
-    if (typeof window !== "undefined") {
-      try {
-        const expiresAt = Number(localStorage.getItem("otk_pro_expires_at") || 0);
-        if (expiresAt > 0 && Date.now() > expiresAt) return false;
-        return localStorage.getItem("otk_is_pro") === "true";
-      } catch {}
-    }
-    return false;
-  });
+  const serverDefault = contextIsPro || (Boolean(initialPlanId) && initialPlanId !== "free");
+  const [isPro, setIsPro] = useState<boolean>(serverDefault);
 
   useEffect(() => {
     if (contextIsPro || (initialPlanId && initialPlanId !== "free")) {
