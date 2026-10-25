@@ -476,8 +476,23 @@ export const AuthComponent = ({
     e.preventDefault();
     if (modalStatus !== "closed") return;
 
+    // If currently on email step, submit should progress to password step
+    if (authStep === "email") {
+      if (isEmailValid) {
+        setAuthStep("password");
+      } else {
+        setModalErrorMessage("Please enter a valid email address.");
+        setModalStatus("error");
+      }
+      return;
+    }
+
     if (mode === "signin") {
-      if (!isPasswordValid) return;
+      if (!isPasswordValid) {
+        setModalErrorMessage("Password must be at least 6 characters.");
+        setModalStatus("error");
+        return;
+      }
       setModalStatus("loading");
       setModalErrorMessage("");
 
@@ -486,6 +501,7 @@ export const AuthComponent = ({
           email: email.trim().toLowerCase(),
           password,
           redirect: false,
+          callbackUrl: "/app",
         });
 
         if (!res || res.error) {
@@ -497,20 +513,27 @@ export const AuthComponent = ({
         setModalStatus("success");
         fireSideCanons();
         setTimeout(() => {
+          const params = new URLSearchParams(window.location.search);
+          const destination = params.get("callbackUrl") || "/app";
           if (onSuccess) {
             onSuccess();
           } else {
-            window.location.href = "/app";
+            window.location.href = destination;
           }
-        }, 700);
+        }, 600);
       } catch (err: any) {
         setModalErrorMessage(err?.message || "Failed to sign in. Please try again.");
         setModalStatus("error");
       }
     } else {
       // Sign-up flow
-      if (authStep !== "confirmPassword") {
-        if (isPasswordValid) setAuthStep("confirmPassword");
+      if (authStep === "password") {
+        if (isPasswordValid) {
+          setAuthStep("confirmPassword");
+        } else {
+          setModalErrorMessage("Password must be at least 6 characters.");
+          setModalStatus("error");
+        }
         return;
       }
 
@@ -536,26 +559,6 @@ export const AuthComponent = ({
         const data = await signupRes.json();
 
         if (signupRes.status === 409) {
-          // Account exists, attempt logging in with credentials
-          const loginRes = await signIn("credentials", {
-            email: email.trim().toLowerCase(),
-            password,
-            redirect: false,
-          });
-
-          if (loginRes?.ok) {
-            setModalStatus("success");
-            fireSideCanons();
-            setTimeout(() => {
-              if (onSuccess) {
-                onSuccess();
-              } else {
-                window.location.href = "/app";
-              }
-            }, 700);
-            return;
-          }
-
           setModalErrorMessage("An account with this email already exists. Please log in with your password.");
           setModalStatus("error");
           setMode("signin");
@@ -570,19 +573,12 @@ export const AuthComponent = ({
         }
 
         // Account created! Now log in to set the NextAuth session cookie
-        const loginRes = await signIn("credentials", {
+        await signIn("credentials", {
           email: email.trim().toLowerCase(),
           password,
           redirect: false,
+          callbackUrl: "/app",
         });
-
-        if (!loginRes?.ok) {
-          setModalErrorMessage("Account created! Please log in with your password.");
-          setModalStatus("error");
-          setMode("signin");
-          setAuthStep("password");
-          return;
-        }
 
         // Clean any leftover Pro cache in localStorage for fresh free account
         try {
@@ -593,12 +589,14 @@ export const AuthComponent = ({
         setModalStatus("success");
         fireSideCanons();
         setTimeout(() => {
+          const params = new URLSearchParams(window.location.search);
+          const destination = params.get("callbackUrl") || "/app";
           if (onSuccess) {
             onSuccess();
           } else {
-            window.location.href = "/app";
+            window.location.href = destination;
           }
-        }, 700);
+        }, 600);
       } catch (err: any) {
         setModalErrorMessage(err?.message || "Registration failed. Please try again.");
         setModalStatus("error");

@@ -27,7 +27,7 @@ export async function getAuthContext(targetWorkspaceId?: string): Promise<Authen
   const preferredWorkspaceId =
     targetWorkspaceId || (session.user as unknown as { workspaceId?: string }).workspaceId;
 
-  const membership = await prisma.membership.findFirst({
+  let membership = await prisma.membership.findFirst({
     where: {
       userId,
       ...(preferredWorkspaceId ? { workspaceId: preferredWorkspaceId } : {}),
@@ -38,6 +38,30 @@ export async function getAuthContext(targetWorkspaceId?: string): Promise<Authen
     },
     orderBy: { id: "asc" },
   });
+
+  if (!membership) {
+    try {
+      const dbUser = await prisma.user.findUnique({ where: { id: userId } });
+      if (dbUser) {
+        const newWs = await prisma.workspace.create({
+          data: {
+            name: `${dbUser.name || "Default"}'s Workspace`,
+            planId: "free",
+          },
+        });
+        membership = await prisma.membership.create({
+          data: {
+            userId: dbUser.id,
+            workspaceId: newWs.id,
+            role: "owner",
+          },
+          include: { workspace: true, user: true },
+        });
+      }
+    } catch (e) {
+      console.error("[getAuthContext self-heal error]:", e);
+    }
+  }
 
   if (!membership) {
     return null;
