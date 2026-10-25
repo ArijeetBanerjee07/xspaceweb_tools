@@ -9,9 +9,14 @@ const requiredCloudinaryKeys = [
 
 export const envSchema = z.object({
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
-  REDIS_URL: z.string().min(1, "REDIS_URL is required"),
+  REDIS_URL: z.string().optional().default("redis://localhost:6379"),
   AUTH_SECRET: z.string().min(1, "AUTH_SECRET is required"),
-  APP_URL: z.string().url("APP_URL must be a valid URL"),
+  APP_URL: z
+    .string()
+    .transform((val) =>
+      val.startsWith("http://") || val.startsWith("https://") ? val : `https://${val}`
+    )
+    .pipe(z.string().url("APP_URL must be a valid URL")),
   CLOUDINARY_CLOUD_NAME: z.string().min(1, "CLOUDINARY_CLOUD_NAME is required"),
   CLOUDINARY_API_KEY: z.string().min(1, "CLOUDINARY_API_KEY is required"),
   CLOUDINARY_API_SECRET: z.string().min(1, "CLOUDINARY_API_SECRET is required"),
@@ -20,6 +25,8 @@ export const envSchema = z.object({
   RAZORPAY_KEY_SECRET: z.string().optional().default(""),
   RAZORPAY_WEBHOOK_SECRET: z.string().optional().default(""),
   GROQ_API_KEY: z.string().optional().default(""),
+  GOOGLE_CLIENT_ID: z.string().optional().default(""),
+  GOOGLE_CLIENT_SECRET: z.string().optional().default(""),
 });
 
 export type Env = z.infer<typeof envSchema>;

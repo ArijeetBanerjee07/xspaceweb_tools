@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import Google from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
@@ -10,25 +11,69 @@ const signInSchema = z.object({
   password: z.string().min(6),
 });
 
+const providers: any[] = [
+  Credentials({
+    credentials: {
+      email: { label: "Email", type: "email" },
+      password: { label: "Password", type: "password" },
+    },
+    authorize: async (credentials) => {
+      const parsed = signInSchema.safeParse(credentials);
+      if (!parsed.success) return null;
+
+      const { email, password } = parsed.data;
+      const user = await prisma.user.findUnique({
+        where: { email: email.toLowerCase() },
+        include: {
+          memberships: {
+            include: { workspace: true },
+            orderBy: { id: "asc" },
+          },
+        },
+      });
+
+      if (!user) return null;
+
+      const isMatch = await bcrypt.compare(password, user.passwordHash);
+      if (!isMatch) return null;
+
+      const primaryWorkspace = user.memberships[0]?.workspace;
+
+      return {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        workspaceId: primaryWorkspace?.id,
+        role: user.memberships[0]?.role,
+      };
+    },
+  }),
+];
+
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  providers.push(
+    Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    })
+  );
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  secret: getEnv().AUTH_SECRET,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || getEnv().AUTH_SECRET,
+  trustHost: true,
   session: { strategy: "jwt" },
   pages: {
     signIn: "/login",
   },
-  providers: [
-    Credentials({
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" },
-      },
-      authorize: async (credentials) => {
-        const parsed = signInSchema.safeParse(credentials);
-        if (!parsed.success) return null;
-
-        const { email, password } = parsed.data;
-        const user = await prisma.user.findUnique({
-          where: { email: email.toLowerCase() },
+  providers,
+  callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        if (!user.email) return false;
+        const normalizedEmail = user.email.toLowerCase();
+        let dbUser = await prisma.user.findUnique({
+          where: { email: normalizedEmail },
           include: {
             memberships: {
               include: { workspace: true },
@@ -37,29 +82,56 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           },
         });
 
-        if (!user) return null;
+        if (!dbUser) {
+          const passwordHash = await bcrypt.hash(Math.random().toString(36) + Date.now(), 10);
+          dbUser = await prisma.user.create({
+            data: {
+              email: normalizedEmail,
+              name: user.name || null,
+              passwordHash,
+            },
+            include: { memberships: true },
+          });
 
-        const isMatch = await bcrypt.compare(password, user.passwordHash);
-        if (!isMatch) return null;
+          const workspace = await prisma.workspace.create({
+            data: {
+              name: `${user.name || "Default"}'s Workspace`,
+              planId: "free",
+            },
+          });
 
-        const primaryWorkspace = user.memberships[0]?.workspace;
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          workspaceId: primaryWorkspace?.id,
-          role: user.memberships[0]?.role,
-        };
-      },
-    }),
-  ],
-  callbacks: {
+          await prisma.membership.create({
+            data: {
+              userId: dbUser.id,
+              workspaceId: workspace.id,
+              role: "owner",
+            },
+          });
+        }
+      }
+      return true;
+    },
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.workspaceId = (user as unknown as { workspaceId?: string }).workspaceId;
         token.role = (user as unknown as { role?: string }).role;
+      }
+      if (!token.workspaceId && token.email) {
+        const dbUser = await prisma.user.findUnique({
+          where: { email: token.email.toLowerCase() },
+          include: {
+            memberships: {
+              include: { workspace: true },
+              orderBy: { id: "asc" },
+            },
+          },
+        });
+        if (dbUser) {
+          token.id = dbUser.id;
+          token.workspaceId = dbUser.memberships[0]?.workspace?.id;
+          token.role = dbUser.memberships[0]?.role;
+        }
       }
       return token;
     },
