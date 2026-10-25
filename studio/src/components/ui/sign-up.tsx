@@ -780,22 +780,15 @@ export const AuthComponent = ({
                 </BlurFade>
 
                 <BlurFade delay={0.3}>
-                  <div className="flex items-center justify-center gap-3 pt-1">
+                  <div className="flex items-center justify-center pt-1">
                     <GlassButton
                       type="button"
                       size="sm"
                       onClick={() => signIn("google", { callbackUrl: "/app" })}
+                      className="px-6 py-2"
                     >
                       <GoogleIcon />
                       <span className="font-semibold text-white">Google</span>
-                    </GlassButton>
-                    <GlassButton
-                      type="button"
-                      size="sm"
-                      onClick={() => signIn("github", { callbackUrl: "/app" })}
-                    >
-                      <GitHubIcon />
-                      <span className="font-semibold text-white">GitHub</span>
                     </GlassButton>
                   </div>
                 </BlurFade>
