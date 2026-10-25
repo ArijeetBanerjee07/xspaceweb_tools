@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String       @id @default(uuid())
+  email        String       @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime     @default(now())
+  memberships  Membership[]
+
+  @@map("users")
+}
+
+model Workspace {
+  id            String         @id @default(uuid())
+  name          String
+  planId        String         @default("free")
+  createdAt     DateTime       @default(now())
+  memberships   Membership[]
+  folders       Folder[]
+  files         File[]
+  jobs          Job[]
+  usageEvents   UsageEvent[]
+  subscriptions Subscription[]
+
+  @@map("workspaces")
+}
+
+enum Role {
+  owner
+  admin
+  member
+}
+
+model Membership {
+  id          String    @id @default(uuid())
+  userId      String
+  workspaceId String
+  role        Role      @default(member)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, workspaceId])
+  @@index([workspaceId])
+  @@index([userId])
+  @@map("memberships")
+}
+
+model Folder {
+  id          String    @id @default(uuid())
+  workspaceId String
+  parentId    String?
+  name        String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  parent      Folder?   @relation("FolderHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Folder[]  @relation("FolderHierarchy")
+  files       File[]
+
+  @@index([workspaceId])
+  @@index([parentId])
+  @@map("folders")
+}
+
+enum FileStatus {
+  uploading
+  ready
+  deleted
+}
+
+model File {
+  id                     String     @id @default(uuid())
+  workspaceId            String
+  folderId               String?
+  name                   String
+  mimeType               String
+  sizeBytes              Int
+  sha256                 String?
+  cloudinaryPublicId     String
+  cloudinaryResourceType String
+  cloudinaryFormat       String
+  status                 FileStatus @default(uploading)
+  expiresAt              DateTime?
+  createdAt              DateTime   @default(now())
+  deletedAt              DateTime?
+  workspace              Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  folder                 Folder?    @relation(fields: [folderId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([workspaceId, status])
+  @@index([expiresAt])
+  @@map("files")
+}
+
+enum JobStatus {
+  queued
+  running
+  succeeded
+  failed
+  cancelled
+}
+
+model Job {
+  id             String       @id @default(uuid())
+  workspaceId    String
+  toolId         String
+  status         JobStatus    @default(queued)
+  progress       Int          @default(0)
+  inputFileIds   Json         @default("[]")
+  outputFileIds  Json         @default("[]")
+  errorCode      String?
+  errorMessage   String?
+  attempts       Int          @default(0)
+  costUnits      Int          @default(0)
+  idempotencyKey String?
+  createdAt      DateTime     @default(now())
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  workspace      Workspace    @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  usageEvents    UsageEvent[]
+
+  @@unique([workspaceId, idempotencyKey])
+  @@index([workspaceId])
+  @@index([status])
+  @@map("jobs")
+}
+
+model UsageEvent {
+  id          String    @id @default(uuid())
+  workspaceId String
+  jobId       String?
+  metric      String
+  quantity    Int
+  createdAt   DateTime  @default(now())
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  job         Job?      @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([workspaceId, metric])
+  @@map("usage_events")
+}
+
+model Subscription {
+  id               String    @id @default(uuid())
+  workspaceId      String
+  provider         String    @default("razorpay")
+  providerRef      String
+  status           String
+  planId           String
+  currentPeriodEnd DateTime?
+  workspace        Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([workspaceId])
+  @@map("subscriptions")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  email     String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([token])
+  @@map("password_reset_tokens")
+}

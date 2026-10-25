@@ -1,0 +1,17 @@
+# XSW Tools - Document Hub Storage Security Configuration
+# Place this inside /public_html/xswtools/
+
+Options -Indexes
+
+# Allow large uploads for document processing
+php_value upload_max_filesize 100M
+php_value post_max_size 120M
+php_value max_execution_time 300
+php_value max_input_time 300
+
+# Prevent script execution inside uploads directory
+<Directory "uploads">
+    php_flag engine off
+    RemoveHandler .php .phtml .php3 .php4 .php5 .php7 .phps
+    RemoveType .php .phtml .php3 .php4 .php5 .php7 .phps
+</Directory>
