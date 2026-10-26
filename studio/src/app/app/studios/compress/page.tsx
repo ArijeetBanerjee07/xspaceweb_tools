@@ -146,6 +146,16 @@ interface BatchItem {
 export default function CompressStudioPage() {
   const [activeTab, setActiveTab] = useState<StudioTab>("compress");
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const tabParam = params.get("tab");
+      if (tabParam && ["compress", "target", "batch", "resize", "upscale", "enhance", "convert"].includes(tabParam)) {
+        setActiveTab(tabParam as StudioTab);
+      }
+    }
+  }, []);
+
   // Single file state
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [originalImage, setOriginalImage] = useState<HTMLImageElement | null>(null);
@@ -792,8 +802,13 @@ export default function CompressStudioPage() {
 
           {processedBlob && (
             <button
-              onClick={() => downloadBlob(processedBlob, `enhanced_${selectedFile?.name || "image.jpg"}`)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shrink-0"
+              onClick={() => {
+                const ext = targetFormat === "jpeg" ? "jpg" : targetFormat;
+                const base = selectedFile?.name.replace(/\.[^/.]+$/, "") || "image";
+                const outName = activeTab === "convert" ? `${base}.${ext}` : `enhanced_${base}.${ext}`;
+                downloadBlob(processedBlob, outName);
+              }}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shrink-0 shadow-xs cursor-pointer"
             >
               <LuDownload className="w-3.5 h-3.5" />
               Download Result
@@ -1371,11 +1386,26 @@ export default function CompressStudioPage() {
                 <button
                   onClick={runConversion}
                   disabled={isProcessing}
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs font-bold transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-2xl text-xs font-bold transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <LuArrowLeftRight className="w-4 h-4" />
-                  Convert to .{targetFormat.toUpperCase()}
+                  {isProcessing ? "Converting..." : `Convert to .${targetFormat.toUpperCase()}`}
                 </button>
+
+                {processedBlob && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const ext = targetFormat === "jpeg" ? "jpg" : targetFormat;
+                      const base = selectedFile?.name.replace(/\.[^/.]+$/, "") || "image";
+                      downloadBlob(processedBlob, `${base}.${ext}`);
+                    }}
+                    className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl text-xs font-bold transition flex items-center justify-center gap-2 shadow-xs cursor-pointer animate-in fade-in"
+                  >
+                    <LuDownload className="w-4 h-4 text-emerald-400" />
+                    Download Converted .{targetFormat.toUpperCase()} ({formatBytes(processedBlob.size)})
+                  </button>
+                )}
               </div>
             </div>
           )}

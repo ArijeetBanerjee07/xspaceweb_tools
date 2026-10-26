@@ -95,7 +95,7 @@ export const GATING_RULES: Record<string, ToolGatingRule> = {
     id: "pdf:organizer",
     name: "Advanced PDF Organizer",
     studio: "pdf",
-    tier: "pro_exclusive",
+    tier: "free_unlimited",
     description: "Multi-document visual page matrix arranger",
   },
 

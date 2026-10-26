@@ -120,17 +120,12 @@ export function StudioShell({ user, workspace, role, children }: StudioShellProp
 
       {/* Mobile Header Bar */}
       <div className="md:hidden flex items-center justify-between px-4 py-3 bg-[#0b1021] text-white border-b border-slate-800 sticky top-0 z-40">
-        <Link href="/app" className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-[#3bb1df]/15 border border-[#3bb1df]/30 flex items-center justify-center p-1 shrink-0">
-            <img
-              src="/brand/xswtools_logo.png"
-              alt="xswtools"
-              className="w-full h-full object-contain drop-shadow-[0_0_6px_rgba(59,177,223,0.5)]"
-            />
-          </div>
-          <span className="font-extrabold text-base tracking-tight text-white">
-            xsw<span className="text-[#3bb1df]">tools</span>
-          </span>
+        <Link href="/app" className="flex items-center">
+          <img
+            src="/logo-full-light.png?v=10"
+            alt="XSWTOOLS"
+            className="h-7 w-auto object-contain"
+          />
         </Link>
         <button
           type="button"
@@ -152,22 +147,12 @@ export function StudioShell({ user, workspace, role, children }: StudioShellProp
       >
         <div className="p-4 flex-1 flex flex-col overflow-y-auto space-y-6">
           {/* Logo & Brand Header */}
-          <Link href="/app" className="flex items-center gap-3 px-2 py-2 rounded-2xl hover:bg-white/5 transition-all group">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#3bb1df]/20 to-blue-600/10 border border-[#3bb1df]/30 flex items-center justify-center p-1.5 shrink-0 shadow-sm shadow-[#3bb1df]/20 group-hover:border-[#3bb1df]/60 transition">
-              <img
-                src="/brand/xswtools_logo.png"
-                alt="xswtools"
-                className="w-full h-full object-contain group-hover:scale-105 transition-transform drop-shadow-[0_0_8px_rgba(59,177,223,0.5)]"
-              />
-            </div>
-            <div>
-              <div className="font-extrabold text-white text-[17px] tracking-tight leading-none group-hover:text-blue-300 transition">
-                xsw<span className="text-[#3bb1df]">tools</span>
-              </div>
-              <div className="text-[10px] text-slate-400 font-medium mt-1 leading-none tracking-wide">
-                Every Tool. One Workspace.
-              </div>
-            </div>
+          <Link href="/app" className="flex items-center px-3 py-2 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all group">
+            <img
+              src="/logo-full-light.png?v=10"
+              alt="XSWTOOLS - Every Tool. One Workspace."
+              className="h-8 w-auto object-contain group-hover:scale-102 transition-transform"
+            />
           </Link>
 
           {/* Primary Navigation */}

@@ -7,23 +7,35 @@ import { prisma } from "@/lib/prisma";
 import { getEnv } from "@/lib/env";
 
 const signInSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  username: z.string().optional(),
+  email: z.string().optional(),
+  password: z.string().min(1),
 });
 
 const providers: any[] = [
   Credentials({
     credentials: {
-      email: { label: "Email", type: "email" },
+      username: { label: "Username", type: "text" },
       password: { label: "Password", type: "password" },
     },
     authorize: async (credentials) => {
       const parsed = signInSchema.safeParse(credentials);
       if (!parsed.success) return null;
 
-      const { email, password } = parsed.data;
-      const user = await prisma.user.findUnique({
-        where: { email: email.toLowerCase() },
+      const identifier = (parsed.data.username || parsed.data.email || "").trim();
+      const password = parsed.data.password;
+      if (!identifier || !password) return null;
+
+      const normalizedSynthetic = `${identifier.toLowerCase()}@xswtools.local`;
+
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { name: { equals: identifier, mode: "insensitive" } },
+            { email: { equals: identifier.toLowerCase() } },
+            { email: { equals: normalizedSynthetic } },
+          ],
+        },
         include: {
           memberships: {
             include: { workspace: true },
@@ -117,9 +129,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.workspaceId = (user as unknown as { workspaceId?: string }).workspaceId;
         token.role = (user as unknown as { role?: string }).role;
       }
-      if (!token.workspaceId && token.email) {
-        const dbUser = await prisma.user.findUnique({
-          where: { email: token.email.toLowerCase() },
+      if (!token.workspaceId && (token.sub || token.email)) {
+        const dbUser = await prisma.user.findFirst({
+          where: {
+            OR: [
+              ...(token.sub ? [{ id: token.sub }] : []),
+              ...(token.email ? [{ email: token.email.toLowerCase() }] : []),
+            ],
+          },
           include: {
             memberships: {
               include: { workspace: true },

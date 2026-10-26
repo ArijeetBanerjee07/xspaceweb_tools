@@ -34,7 +34,8 @@ export type ConvertAction =
   | "pdf-to-ppt"
   | "ppt-to-pdf"
   | "pdf-to-images"
-  | "images-to-pdf";
+  | "images-to-pdf"
+  | "pdf-to-text";
 
 export interface ConvertResult {
   buffer: Buffer;
@@ -125,15 +126,30 @@ async function extractStructuredPdf(buffer: Buffer): Promise<StructuredPdf> {
         let lastRight: number | null = null;
 
         for (const it of rowItems) {
-          const x = it.transform[4];
-          const w = it.width || Math.max(12, it.str.length * 6);
+          const str = String(it.str || "");
+          if (!str) continue;
 
-          // If gap between previous right edge and current start is > 14 points, treat as separate column
-          if (lastRight !== null && x - lastRight > 14) {
-            if (curCol.trim()) cols.push(curCol.trim());
-            curCol = it.str;
+          const x = it.transform[4];
+          const fontSize = Math.abs(it.transform[0]) || Math.abs(it.transform[3]) || it.height || 10;
+          const w = it.width || (str.length * fontSize * 0.52);
+
+          if (lastRight === null) {
+            curCol = str;
           } else {
-            curCol = curCol ? `${curCol} ${it.str}` : it.str;
+            const gap = x - lastRight;
+            // Column separation threshold (tabular cells or wide tabs)
+            const colGapThreshold = Math.max(22, fontSize * 2.2);
+
+            if (gap >= colGapThreshold) {
+              if (curCol.trim()) cols.push(curCol.trim());
+              curCol = str;
+            } else if (gap > 1.8 && !curCol.endsWith(" ") && !str.startsWith(" ")) {
+              // Standard inter-word whitespace
+              curCol += " " + str;
+            } else {
+              // Contiguous letters in the same word (gap <= 1.8 or kerning/ligature)
+              curCol += str;
+            }
           }
           lastRight = x + w;
         }
@@ -144,9 +160,9 @@ async function extractStructuredPdf(buffer: Buffer): Promise<StructuredPdf> {
           allRows.push({
             pageNumber: p,
             columns: cols,
-            fullLine: cols.join("    "),
+            fullLine: cols.length === 1 ? cols[0] : cols.join("    "),
           });
-          allLines.push(cols.join("    "));
+          allLines.push(cols.length === 1 ? cols[0] : cols.join("    "));
         }
       }
     }
@@ -298,24 +314,89 @@ export async function convertDocument(
       const flushTable = () => {
         if (tableBatch.length === 0) return;
 
+        // If tableBatch only has 1 row, it's not a real multi-row table (e.g. aligned metadata, date/author, header)
+        if (tableBatch.length === 1) {
+          const singleRow = tableBatch[0];
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: singleRow.join("        "),
+                  size: 22,
+                  color: "334155",
+                }),
+              ],
+              spacing: { after: 120, before: 40 },
+            })
+          );
+          tableBatch = [];
+          return;
+        }
+
         const maxCols = Math.max(...tableBatch.map((r) => r.length));
-        const tableRows = tableBatch.map((r, rowIdx) => {
+        if (maxCols === 0) {
+          tableBatch = [];
+          return;
+        }
+
+        // Calculate proportional column widths based on maximum character count per column
+        const colLengths = Array.from({ length: maxCols }, (_, c) => {
+          let maxLen = 4;
+          for (const r of tableBatch) {
+            const val = r[c] || "";
+            if (val.length > maxLen) maxLen = val.length;
+          }
+          return maxLen;
+        });
+        const totalContentLen = colLengths.reduce((a, b) => a + b, 0);
+        const colWidthPercents = colLengths.map((len) =>
+          Math.max(10, Math.round((len / totalContentLen) * 100))
+        );
+        const sumPercents = colWidthPercents.reduce((a, b) => a + b, 0);
+        const finalWidths = colWidthPercents.map((w) =>
+          Math.floor((w / sumPercents) * 100)
+        );
+
+        const tableBorder = {
+          style: BorderStyle.SINGLE,
+          size: 4,
+          color: "CBD5E1",
+        };
+
+        const cellBorders = {
+          top: tableBorder,
+          bottom: tableBorder,
+          left: tableBorder,
+          right: tableBorder,
+        };
+
+        const tableRows = tableBatch.map((row, rowIdx) => {
           const isHeader = rowIdx === 0;
           return new TableRow({
+            tableHeader: isHeader,
             children: Array.from({ length: maxCols }).map((_, colIdx) => {
-              const textVal = r[colIdx] || "";
+              const textVal = row[colIdx] || "";
               return new TableCell({
-                width: { size: Math.floor(100 / maxCols), type: WidthType.PERCENTAGE },
+                width: {
+                  size: finalWidths[colIdx] || Math.floor(100 / maxCols),
+                  type: WidthType.PERCENTAGE,
+                },
+                borders: cellBorders,
+                shading: {
+                  fill: isHeader ? "F1F5F9" : rowIdx % 2 === 1 ? "F8FAFC" : "FFFFFF",
+                },
+                margins: { top: 100, bottom: 100, left: 140, right: 140 },
                 children: [
                   new Paragraph({
                     children: [
                       new TextRun({
                         text: textVal,
                         bold: isHeader,
-                        size: 20,
+                        size: isHeader ? 21 : 20,
+                        color: isHeader ? "0F172A" : "334155",
                       }),
                     ],
-                    spacing: { before: 60, after: 60 },
+                    spacing: { before: 40, after: 40 },
                   }),
                 ],
               });
@@ -330,8 +411,7 @@ export async function convertDocument(
           })
         );
 
-        // Add spacing after table
-        children.push(new Paragraph({ text: "", spacing: { after: 140 } }));
+        children.push(new Paragraph({ text: "", spacing: { after: 120 } }));
         tableBatch = [];
       };
 
@@ -344,21 +424,40 @@ export async function convertDocument(
           const lineText = row.fullLine.trim();
           if (!lineText) continue;
 
+          // Check if this line looks like a major section heading (All Caps, short)
+          const isHeading =
+            lineText.length < 50 &&
+            lineText === lineText.toUpperCase() &&
+            /[A-Z]/.test(lineText) &&
+            !lineText.includes(":") &&
+            !lineText.endsWith(".");
+
           // Check if this line looks like a sub-heading (short and distinct)
           const isSubheading =
-            lineText.length < 40 &&
-            (lineText.endsWith(":") || /^(section|chapter|part|page|sheet)\b/i.test(lineText));
+            !isHeading &&
+            lineText.length < 50 &&
+            (lineText.endsWith(":") || /^(section|chapter|part|page|sheet|note|table|terms)\b/i.test(lineText));
+
+          const isBullet = /^[•\-\*▪►]\s*/.test(lineText) || /^\d+[\.\)]\s+/.test(lineText);
+          const cleanText = isBullet ? lineText.replace(/^[•\-\*▪►]\s*/, "") : lineText;
 
           children.push(
             new Paragraph({
+              heading: isHeading ? HeadingLevel.HEADING_2 : undefined,
+              bullet: isBullet ? { level: 0 } : undefined,
               children: [
                 new TextRun({
-                  text: lineText,
-                  bold: isSubheading,
-                  size: isSubheading ? 24 : 22,
+                  text: cleanText,
+                  bold: isHeading || isSubheading,
+                  size: isHeading ? 26 : isSubheading ? 23 : 21,
+                  color: isHeading ? "0F172A" : isSubheading ? "1E293B" : "334155",
                 }),
               ],
-              spacing: { after: isSubheading ? 140 : 100 },
+              spacing: {
+                before: isHeading ? 200 : isSubheading ? 140 : 40,
+                after: isHeading ? 100 : isSubheading ? 80 : 80,
+                line: 276, // 1.15 line spacing
+              },
             })
           );
         }
@@ -388,16 +487,37 @@ export async function convertDocument(
     }
 
     case "word-to-pdf": {
-      let rawText = "";
-      try {
-        const result = await mammoth.extractRawText({ buffer: fileBuffer });
-        rawText = result.value || "";
-      } catch (err) {
-        console.warn("Mammoth extraction warning:", err);
-      }
+      // Clean Unicode characters that StandardFonts (WinAnsi) cannot encode
+      const sanitizeWinAnsi = (str: string): string => {
+        if (!str) return "";
+        return str
+          .replace(/[≥]/g, ">=")
+          .replace(/[≤]/g, "<=")
+          .replace(/[≠]/g, "!=")
+          .replace(/[±]/g, "+/-")
+          .replace(/[×]/g, "x")
+          .replace(/[÷]/g, "/")
+          .replace(/[–—]/g, "-")
+          .replace(/['']/g, "'")
+          .replace(/[""]/g, '"')
+          .replace(/[•▪►]/g, "*")
+          .replace(/[…]/g, "...")
+          .replace(/[→⇒]/g, "->")
+          .replace(/[←⇐]/g, "<-")
+          .replace(/[µ]/g, "u")
+          .replace(/[°]/g, " deg")
+          .replace(/[²]/g, "^2")
+          .replace(/[³]/g, "^3")
+          .replace(/[^\x09\x0A\x0D\x20-\x7E\xA0-\xFF]/g, " "); // Strip anything else outside WinAnsi
+      };
 
-      const textToUse = rawText.trim() || `Document: ${originalFileName}\nWord document processed.`;
-      const lines = textToUse.split(/\r?\n/).map((l: string) => l.trim()).filter(Boolean);
+      let htmlContent = "";
+      try {
+        const res = await mammoth.convertToHtml({ buffer: fileBuffer });
+        htmlContent = res.value || "";
+      } catch (err) {
+        console.warn("Mammoth HTML conversion fallback:", err);
+      }
 
       const pdfDoc = await PDFDocument.create();
       const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
@@ -405,67 +525,179 @@ export async function convertDocument(
 
       const pageWidth = 595.28;
       const pageHeight = 841.89;
-      const margin = 50;
-      const fontSize = 11;
-      const lineHeight = 16;
-      const maxLineWidth = pageWidth - margin * 2;
+      const margin = 48;
+      const contentWidth = pageWidth - margin * 2;
+      const baseLineHeight = 15;
 
       let page = pdfDoc.addPage([pageWidth, pageHeight]);
       let y = pageHeight - margin;
 
-      // Draw Title
-      page.drawText(baseName, {
+      const ensureSpace = (needed: number) => {
+        if (y < margin + needed) {
+          page = pdfDoc.addPage([pageWidth, pageHeight]);
+          y = pageHeight - margin;
+        }
+      };
+
+      // Draw Document Title Header
+      page.drawText(sanitizeWinAnsi(baseName), {
         x: margin,
         y: y - 10,
-        size: 20,
+        size: 18,
         font: boldFont,
-        color: rgb(0.1, 0.1, 0.15),
+        color: rgb(0.08, 0.12, 0.2),
       });
-      y -= 45;
+      y -= 38;
 
-      for (const rawLine of lines) {
-        const words = rawLine.split(/\s+/);
-        let currentLine = "";
-
-        for (const word of words) {
-          const testLine = currentLine ? `${currentLine} ${word}` : word;
-          const testWidth = font.widthOfTextAtSize(testLine, fontSize);
-
-          if (testWidth > maxLineWidth && currentLine) {
-            if (y < margin + lineHeight) {
-              page = pdfDoc.addPage([pageWidth, pageHeight]);
-              y = pageHeight - margin;
-            }
-            page.drawText(currentLine, {
-              x: margin,
-              y,
-              size: fontSize,
-              font,
-              color: rgb(0.2, 0.2, 0.25),
-            });
-            y -= lineHeight;
-            currentLine = word;
-          } else {
-            currentLine = testLine;
-          }
-        }
-
-        if (currentLine) {
-          if (y < margin + lineHeight) {
-            page = pdfDoc.addPage([pageWidth, pageHeight]);
-            y = pageHeight - margin;
-          }
-          page.drawText(currentLine, {
+      if (!htmlContent) {
+        // Fallback for empty or plain documents
+        let raw = "";
+        try {
+          const res = await mammoth.extractRawText({ buffer: fileBuffer });
+          raw = res.value || "";
+        } catch {}
+        const text = sanitizeWinAnsi(raw.trim() || `Document: ${originalFileName}\nWord document processed.`);
+        for (const line of text.split(/\r?\n/)) {
+          ensureSpace(baseLineHeight);
+          page.drawText(line.slice(0, 95), {
             x: margin,
             y,
-            size: fontSize,
+            size: 10,
             font,
-            color: rgb(0.2, 0.2, 0.25),
+            color: rgb(0.2, 0.23, 0.28),
           });
-          y -= lineHeight;
+          y -= baseLineHeight;
         }
+      } else {
+        // Parse HTML blocks: tables, headings, list items, paragraphs
+        const blockRegex = /<(table|h[1-6]|p|li)[\s\S]*?<\/\1>/gi;
+        const blocks = htmlContent.match(blockRegex) || [];
 
-        y -= 6;
+        const stripHtml = (html: string) =>
+          html.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim();
+
+        for (const block of blocks) {
+          const lower = block.toLowerCase();
+
+          if (lower.startsWith("<table")) {
+            // Parse table rows and cells
+            const rowMatches = block.match(/<tr[\s\S]*?<\/tr>/gi) || [];
+            if (rowMatches.length === 0) continue;
+
+            const tableData: string[][] = [];
+            for (const tr of rowMatches) {
+              const cellMatches = tr.match(/<(td|th)[\s\S]*?<\/\1>/gi) || [];
+              const rowCells = cellMatches.map((c) => sanitizeWinAnsi(stripHtml(c)));
+              if (rowCells.length > 0) tableData.push(rowCells);
+            }
+
+            if (tableData.length === 0) continue;
+
+            const numCols = Math.min(Math.max(...tableData.map((r) => r.length), 1), 8);
+            const colWidth = Math.floor(contentWidth / numCols);
+            const tableRowHeight = 18;
+
+            y -= 8;
+            for (let rIdx = 0; rIdx < tableData.length; rIdx++) {
+              ensureSpace(tableRowHeight);
+              const isHeaderRow = rIdx === 0;
+
+              // Header background fill
+              if (isHeaderRow) {
+                page.drawRectangle({
+                  x: margin,
+                  y: y - 3,
+                  width: numCols * colWidth,
+                  height: tableRowHeight,
+                  color: rgb(0.93, 0.95, 0.98),
+                });
+              }
+
+              for (let cIdx = 0; cIdx < numCols; cIdx++) {
+                const cellText = (tableData[rIdx][cIdx] || "").slice(0, Math.floor(colWidth / 6));
+                const cellX = margin + cIdx * colWidth;
+
+                page.drawRectangle({
+                  x: cellX,
+                  y: y - 3,
+                  width: colWidth,
+                  height: tableRowHeight,
+                  borderColor: rgb(0.85, 0.88, 0.92),
+                  borderWidth: 0.5,
+                });
+
+                if (cellText) {
+                  page.drawText(cellText, {
+                    x: cellX + 4,
+                    y: y + 2,
+                    size: 8.5,
+                    font: isHeaderRow ? boldFont : font,
+                    color: isHeaderRow ? rgb(0.08, 0.12, 0.2) : rgb(0.2, 0.23, 0.28),
+                  });
+                }
+              }
+              y -= tableRowHeight;
+            }
+            y -= 10;
+          } else if (lower.startsWith("<h")) {
+            const hText = sanitizeWinAnsi(stripHtml(block));
+            if (!hText) continue;
+            ensureSpace(24);
+            y -= 6;
+            page.drawText(hText.slice(0, 80), {
+              x: margin,
+              y,
+              size: 13,
+              font: boldFont,
+              color: rgb(0.09, 0.15, 0.28),
+            });
+            y -= 18;
+          } else {
+            // Paragraph or bullet item
+            const pText = sanitizeWinAnsi(stripHtml(block));
+            if (!pText) continue;
+
+            const isLi = lower.startsWith("<li");
+            const prefix = isLi ? "* " : "";
+            const fullText = prefix + pText;
+
+            const words = fullText.split(/\s+/);
+            let currentLine = "";
+
+            for (const word of words) {
+              const testLine = currentLine ? `${currentLine} ${word}` : word;
+              const testWidth = font.widthOfTextAtSize(testLine, 9.5);
+
+              if (testWidth > contentWidth && currentLine) {
+                ensureSpace(baseLineHeight);
+                page.drawText(currentLine, {
+                  x: margin + (isLi ? 10 : 0),
+                  y,
+                  size: 9.5,
+                  font,
+                  color: rgb(0.2, 0.23, 0.28),
+                });
+                y -= baseLineHeight;
+                currentLine = word;
+              } else {
+                currentLine = testLine;
+              }
+            }
+
+            if (currentLine) {
+              ensureSpace(baseLineHeight);
+              page.drawText(currentLine, {
+                x: margin + (isLi ? 10 : 0),
+                y,
+                size: 9.5,
+                font,
+                color: rgb(0.2, 0.23, 0.28),
+              });
+              y -= baseLineHeight;
+            }
+            y -= 3;
+          }
+        }
       }
 
       const buffer = Buffer.from(await pdfDoc.save());
@@ -481,63 +713,99 @@ export async function convertDocument(
       const rows = extracted.rows;
 
       const workbook = new ExcelJS.Workbook();
-      workbook.creator = "Document Converter";
+      workbook.creator = "XSpaceWeb Tools";
       workbook.created = new Date();
 
       // Check if document has sheet title, e.g. "Sheet: Sheet1"
-      let sheetName = "Sheet1";
+      let defaultSheetName = "Sheet1";
       let startRowIdx = 0;
 
       if (rows.length > 0 && rows[0].columns.length === 1 && /^sheet:\s*(.+)$/i.test(rows[0].columns[0])) {
         const match = rows[0].columns[0].match(/^sheet:\s*(.+)$/i);
         if (match && match[1]) {
-          sheetName = match[1].trim().slice(0, 31);
+          defaultSheetName = match[1].trim().slice(0, 31);
           startRowIdx = 1;
         }
       }
 
-      const sheet = workbook.addWorksheet(sheetName);
+      // Group rows by PDF page number if multi-page document, or combine cleanly
+      const pageNumbers = Array.from(new Set(rows.map((r) => r.pageNumber || 1))).sort((a, b) => a - b);
+      const isMultiPage = pageNumbers.length > 1;
 
-      const maxCols = Math.max(1, ...rows.map((r) => r.columns.length));
-      const colWidths: number[] = Array(maxCols).fill(12);
+      // Thin border style for clean Excel presentation across all spreadsheet apps (Excel, Google Sheets, LibreOffice, Numbers)
+      const thinBorder: any = {
+        top: { style: "thin", color: { argb: "FFD4D4D8" } },
+        left: { style: "thin", color: { argb: "FFD4D4D8" } },
+        bottom: { style: "thin", color: { argb: "FFD4D4D8" } },
+        right: { style: "thin", color: { argb: "FFD4D4D8" } },
+      };
 
-      let isFirstTableContentRow = true;
+      for (const pNum of (isMultiPage ? pageNumbers : [1])) {
+        const pageRows = rows.filter((r, idx) => (isMultiPage ? r.pageNumber === pNum : idx >= startRowIdx));
+        if (pageRows.length === 0) continue;
 
-      for (let i = startRowIdx; i < rows.length; i++) {
-        const row = rows[i];
-        if (row.columns.length === 0) continue;
-
-        // Convert string values to numbers where suitable (e.g. roll numbers, marks, percentages)
-        const cellValues = row.columns.map((colStr, colIdx) => {
-          const trimmed = colStr.trim();
-          colWidths[colIdx] = Math.max(colWidths[colIdx] || 12, trimmed.length + 4);
-
-          const num = Number(trimmed);
-          if (!isNaN(num) && trimmed !== "" && !trimmed.startsWith("0")) {
-            return num;
-          }
-          return trimmed;
+        const sheetName = isMultiPage ? `Page ${pNum}` : defaultSheetName;
+        const sheet = workbook.addWorksheet(sheetName, {
+          views: [{ showGridLines: true }],
         });
 
-        const addedRow = sheet.addRow(cellValues);
+        const maxCols = Math.max(1, ...pageRows.map((r) => r.columns.length));
+        const colWidths: number[] = Array(maxCols).fill(14);
+        let isFirstTableContentRow = true;
 
-        // Style the first multi-column row as the table header
-        if (isFirstTableContentRow && row.columns.length > 1) {
-          addedRow.font = { bold: true, color: { argb: "FF0F172A" } };
-          addedRow.fill = {
-            type: "pattern",
-            pattern: "solid",
-            fgColor: { argb: "FFF1F5F9" },
-          };
-          addedRow.height = 24;
-          isFirstTableContentRow = false;
-        } else if (row.columns.length > 1) {
-          addedRow.height = 20;
+        for (const row of pageRows) {
+          if (row.columns.length === 0) continue;
+
+          // Convert string values to numbers/currencies where suitable
+          const cellValues = row.columns.map((colStr, colIdx) => {
+            const trimmed = colStr.trim();
+            colWidths[colIdx] = Math.max(colWidths[colIdx] || 14, trimmed.length + 3);
+
+            // Clean currency symbols or commas for numeric parsing
+            const numericCandidate = trimmed.replace(/^[$€£₹]\s?/, "").replace(/,/g, "");
+            const num = Number(numericCandidate);
+            if (!isNaN(num) && numericCandidate !== "" && !trimmed.startsWith("0") && numericCandidate.length < 15) {
+              return num;
+            }
+            return trimmed;
+          });
+
+          const addedRow = sheet.addRow(cellValues);
+
+          // Apply styling
+          if (isFirstTableContentRow && row.columns.length > 1) {
+            addedRow.font = { bold: true, color: { argb: "FF0F172A" }, size: 10 };
+            addedRow.fill = {
+              type: "pattern",
+              pattern: "solid",
+              fgColor: { argb: "FFF1F5F9" },
+            };
+            addedRow.height = 24;
+            addedRow.alignment = { vertical: "middle", horizontal: "left" };
+            addedRow.eachCell((cell) => {
+              cell.border = thinBorder;
+            });
+            isFirstTableContentRow = false;
+          } else if (row.columns.length > 1) {
+            addedRow.height = 20;
+            addedRow.font = { size: 9.5, color: { argb: "FF334155" } };
+            addedRow.alignment = { vertical: "middle" };
+            addedRow.eachCell((cell, colIdx) => {
+              cell.border = thinBorder;
+              if (typeof cell.value === "number") {
+                cell.alignment = { vertical: "middle", horizontal: "right" };
+              }
+            });
+          } else {
+            // Single column line / heading
+            addedRow.font = { bold: true, size: 10, color: { argb: "FF1E293B" } };
+            addedRow.height = 22;
+          }
         }
-      }
 
-      // Apply calculated column widths
-      sheet.columns = colWidths.map((w) => ({ width: Math.min(Math.max(w, 14), 50) }));
+        // Apply calculated column widths (bounded between 14 and 45 characters)
+        sheet.columns = colWidths.map((w) => ({ width: Math.min(Math.max(w, 14), 45) }));
+      }
 
       const buffer = Buffer.from(await workbook.xlsx.writeBuffer());
       return {
@@ -549,7 +817,16 @@ export async function convertDocument(
 
     case "excel-to-pdf": {
       const workbook = new ExcelJS.Workbook();
-      await workbook.xlsx.load(fileBuffer as any);
+      const isCsv = originalFileName.toLowerCase().endsWith(".csv");
+
+      if (isCsv) {
+        const stream = require("stream");
+        const bufferStream = new stream.PassThrough();
+        bufferStream.end(fileBuffer);
+        await workbook.csv.read(bufferStream);
+      } else {
+        await workbook.xlsx.load(fileBuffer as any);
+      }
 
       const pdfDoc = await PDFDocument.create();
       const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -557,48 +834,98 @@ export async function convertDocument(
 
       const pageWidth = 841.89; // Landscape A4
       const pageHeight = 595.28;
-      const margin = 40;
+      const margin = 36;
+      const contentWidth = pageWidth - margin * 2;
 
-      workbook.eachSheet((worksheet) => {
+      // Helper to cleanly extract text from any ExcelJS cell value type
+      const getCellString = (val: any): string => {
+        if (val === null || val === undefined) return "";
+        if (typeof val === "object") {
+          if (val.result !== undefined) return String(val.result);
+          if (Array.isArray(val.richText)) return val.richText.map((t: any) => t.text || "").join("");
+          if (val.text !== undefined) return String(val.text);
+          if (val instanceof Date) return val.toLocaleDateString();
+          return "";
+        }
+        return String(val);
+      };
+
+      const sheets = workbook.worksheets.filter((ws) => ws.rowCount > 0);
+      const activeSheets = sheets.length > 0 ? sheets : [workbook.addWorksheet("Sheet1")];
+
+      for (const worksheet of activeSheets) {
         let page = pdfDoc.addPage([pageWidth, pageHeight]);
         let y = pageHeight - margin;
 
-        // Sheet Header
+        // Sheet Title Header
         page.drawText(`Sheet: ${worksheet.name}`, {
           x: margin,
           y,
-          size: 16,
+          size: 14,
           font: boldFont,
-          color: rgb(0.1, 0.35, 0.2),
+          color: rgb(0.08, 0.35, 0.22),
         });
-        y -= 25;
+        y -= 22;
+
+        // Determine max columns (cap at 12 to maintain readable fit on landscape A4)
+        const maxCols = Math.min(Math.max(worksheet.columnCount || 1, 1), 12);
+        const colWidth = Math.floor(contentWidth / maxCols);
+        const rowHeight = 18;
 
         worksheet.eachRow((row, rowNumber) => {
-          if (y < margin + 15) {
+          if (y < margin + rowHeight) {
             page = pdfDoc.addPage([pageWidth, pageHeight]);
             y = pageHeight - margin;
           }
 
-          let x = margin;
-          const colWidth = 120;
           const isHeader = rowNumber === 1;
 
-          row.eachCell((cell, colNumber) => {
-            if (colNumber > 6) return;
-            const cellValue = cell.text ? String(cell.text).slice(0, 20) : "";
-            page.drawText(cellValue, {
-              x,
-              y,
-              size: 9,
-              font: isHeader ? boldFont : font,
-              color: isHeader ? rgb(0.1, 0.1, 0.2) : rgb(0.2, 0.2, 0.25),
+          // Header background fill
+          if (isHeader) {
+            page.drawRectangle({
+              x: margin,
+              y: y - 3,
+              width: maxCols * colWidth,
+              height: rowHeight,
+              color: rgb(0.93, 0.95, 0.97),
             });
-            x += colWidth;
-          });
+          }
 
-          y -= 16;
+          // Draw cells with exact absolute column positioning
+          for (let colIdx = 1; colIdx <= maxCols; colIdx++) {
+            const cell = row.getCell(colIdx);
+            const rawVal = cell.value;
+            const textVal = getCellString(rawVal).trim();
+            const cellX = margin + (colIdx - 1) * colWidth;
+
+            // Draw cell border
+            page.drawRectangle({
+              x: cellX,
+              y: y - 3,
+              width: colWidth,
+              height: rowHeight,
+              borderColor: rgb(0.85, 0.88, 0.92),
+              borderWidth: 0.5,
+            });
+
+            if (textVal) {
+              // Truncate based on column width
+              const maxChars = Math.max(8, Math.floor(colWidth / 5.8));
+              const truncated = textVal.length > maxChars ? textVal.slice(0, maxChars - 1) + "…" : textVal;
+
+              page.drawText(truncated, {
+                x: cellX + 4,
+                y: y + 2,
+                size: 8.5,
+                font: isHeader ? boldFont : font,
+                color: isHeader ? rgb(0.08, 0.12, 0.2) : rgb(0.2, 0.23, 0.28),
+              });
+            }
+          }
+
+          y -= rowHeight;
         });
-      });
+      }
 
       const buffer = Buffer.from(await pdfDoc.save());
       return {
@@ -1157,6 +1484,21 @@ export async function convertDocument(
         buffer,
         fileName: resolvedPdfName,
         mimeType: "application/pdf",
+      };
+    }
+
+    case "pdf-to-text": {
+      const extracted = await extractStructuredPdf(fileBuffer);
+      const textOutput = extracted.rawText || extracted.lines.join("\n") || "No selectable text found in the document.";
+      const cleanCustomName = customOutputName?.trim();
+      const resolvedTextName = cleanCustomName
+        ? (cleanCustomName.toLowerCase().endsWith(".txt") ? cleanCustomName : `${cleanCustomName}.txt`)
+        : (baseName ? `${baseName}.txt` : "extracted_text.txt");
+
+      return {
+        buffer: Buffer.from(textOutput, "utf-8"),
+        fileName: resolvedTextName,
+        mimeType: "text/plain; charset=utf-8",
       };
     }
 

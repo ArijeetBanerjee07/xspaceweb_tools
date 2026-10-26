@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { AuthComponent } from "@/components/ui/sign-up";
 
 export default function LoginPage() {
@@ -10,13 +9,15 @@ export default function LoginPage() {
       initialMode="signin"
       logo={
         <img
-          src="/brand/xswtools_logo.png"
+          src="/logo.png"
           alt="XSW Tools"
           className="h-8 w-auto object-contain"
         />
       }
       onSuccess={() => {
-        window.location.href = "/app";
+        const params = new URLSearchParams(window.location.search);
+        const destination = params.get("callbackUrl") || params.get("redirect") || "/app";
+        window.location.href = destination;
       }}
     />
   );

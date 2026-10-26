@@ -22,11 +22,13 @@ export default async function DashboardPage() {
           take: 200,
         }).catch(() => []),
         getMonthUsage(auth.workspaceId).catch(() => null),
-        prisma.activity.findMany({
-          where: { workspaceId: auth.workspaceId },
-          orderBy: { createdAt: "desc" },
-          take: 200,
-        }).catch(() => []),
+        (prisma as any).activity?.findMany
+          ? (prisma as any).activity.findMany({
+              where: { workspaceId: auth.workspaceId },
+              orderBy: { createdAt: "desc" },
+              take: 200,
+            }).catch(() => [])
+          : Promise.resolve([]),
         prisma.file.findMany({
           where: { workspaceId: auth.workspaceId },
         }).catch(() => []),

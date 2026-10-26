@@ -440,7 +440,7 @@ export async function compareTwoDocuments(
   const snippet2 = doc2.content.slice(0, 7000);
 
   const systemPrompt = `You are a precision contract and document auditor comparing Document A ("${doc1.name}") vs Document B ("${doc2.name}").
-Analyze all changes and present your findings with structured comparison tables and clear headings:
+Analyze all changes and present your findings strictly in clean, standard Markdown format without any raw HTML tags (do not use <br>, <hr>, <b>, <i>, or <table> tags).
 
 ### 1. Executive Summary of Changes
 Provide a 2-3 sentence overview of what changed between the two versions.

@@ -120,7 +120,7 @@ async function runSandboxTests() {
   const pdfPageNumFree = evaluateFeatureAccess("pdf:page-numbering", false, 0);
   assert(!pdfPageNumFree.allowed && pdfPageNumFree.requiresUpgrade, "PDF Page Numbering: Blocked on Free tier (Pro Exclusive)");
   const pdfOrganizerFree = evaluateFeatureAccess("pdf:organizer", false, 0);
-  assert(!pdfOrganizerFree.allowed && pdfOrganizerFree.requiresUpgrade, "PDF Organizer Matrix: Blocked on Free tier (Pro Exclusive)");
+  assert(pdfOrganizerFree.allowed && !pdfOrganizerFree.requiresUpgrade, "PDF Organizer Matrix: Free tier access");
 
   // Pro user unrestricted
   const pdfOverlaysPro = evaluateFeatureAccess("pdf:edit-overlays", true, 999);

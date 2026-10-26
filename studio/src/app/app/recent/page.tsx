@@ -16,11 +16,13 @@ export default async function RecentJobsPage() {
           orderBy: { createdAt: "desc" },
           take: 50,
         }).catch(() => []),
-        prisma.activity.findMany({
-          where: { workspaceId: auth.workspaceId },
-          orderBy: { createdAt: "desc" },
-          take: 50,
-        }).catch(() => []),
+        (prisma as any).activity?.findMany
+          ? (prisma as any).activity.findMany({
+              where: { workspaceId: auth.workspaceId },
+              orderBy: { createdAt: "desc" },
+              take: 50,
+            }).catch(() => [])
+          : Promise.resolve([]),
       ]);
 
       const mappedJobs = (jobs || []).map((j: any) => ({

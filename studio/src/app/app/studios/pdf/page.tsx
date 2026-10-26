@@ -159,7 +159,7 @@ export default function PDFStudioPage() {
       id: "edit-pdf",
       action: "edit-pdf",
       title: "Edit PDF",
-      desc: "Add text, images, shapes, etc.",
+      desc: "Add text stamps, markings, callout badges, and annotations",
       icon: <LuPencil className="w-4 h-4" />,
       iconBg: "bg-red-500",
       borderHover: "hover:border-red-400 group-hover:border-red-300",
@@ -633,16 +633,11 @@ export default function PDFStudioPage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
               {organizeTools.map((t) => {
-                const isOrganizerPro = t.id === "organize-pdf";
+                const isOrganizerPro = false;
                 return (
                 <div
                   key={t.title}
                   onClick={() => {
-                    if (isOrganizerPro && !isPro) {
-                      setHighlightFeature("Advanced PDF Organizer");
-                      setIsUpgradeOpen(true);
-                      return;
-                    }
                     setSelectedOrganizeTool(t);
                   }}
                   className={`group relative overflow-hidden backdrop-blur-xl bg-white/70 hover:bg-white/95 border border-slate-200/80 ${t.borderHover} rounded-2xl p-4 shadow-xs hover:shadow-lg transition-all duration-300 cursor-pointer flex flex-col justify-between space-y-3`}

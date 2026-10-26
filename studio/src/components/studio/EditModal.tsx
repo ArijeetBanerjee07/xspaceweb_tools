@@ -36,6 +36,7 @@ import {
   LuUndo2,
   LuEraser,
 } from "react-icons/lu";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 export type EditAction =
   | "edit-pdf"
@@ -228,7 +229,17 @@ export function EditModal({ isOpen, onClose, tool }: EditModalProps) {
 
   // Page Numbers Specific State
   const [pageNumbersEnabled, setPageNumbersEnabled] = useState<boolean>(true);
-  const [pageNumberFormat, setPageNumberFormat] = useState<"page-x-of-y" | "page-x" | "x-only" | "dash-x-dash" | "x-slash-y">("page-x-of-y");
+  const [pageNumberFormat, setPageNumberFormat] = useState<
+    | "page-x-of-y"
+    | "page-x"
+    | "x-only"
+    | "dash-x-dash"
+    | "x-slash-y"
+    | "bracket-x"
+    | "pg-x"
+    | "roman-lower"
+    | "roman-upper"
+  >("page-x-of-y");
   const [pageNumberPosition, setPageNumberPosition] = useState<"bottom-center" | "bottom-left" | "bottom-right" | "top-center" | "top-left" | "top-right">("bottom-center");
   const [pageNumberFontSize, setPageNumberFontSize] = useState<number>(11);
   const [pageNumberColor, setPageNumberColor] = useState<string>("#334155");
@@ -991,13 +1002,38 @@ export function EditModal({ isOpen, onClose, tool }: EditModalProps) {
   };
 
   const parseColor = (col: string) => {
-    if (col === "#000000" || col === "black") return rgb(0, 0, 0);
-    if (col === "#2563eb" || col === "blue") return rgb(0.145, 0.388, 0.922);
-    if (col === "#dc2626" || col === "red") return rgb(0.863, 0.149, 0.149);
-    if (col === "#16a34a" || col === "green") return rgb(0.086, 0.639, 0.29);
-    if (col === "#ffffff" || col === "white") return rgb(1, 1, 1);
-    if (col === "#334155" || col === "#475569") return rgb(0.2, 0.25, 0.33);
-    return rgb(0, 0, 0);
+    if (!col) return rgb(0, 0, 0);
+    const hex = col.trim().replace(/^#/, "");
+    if (hex.length === 6) {
+      const r = parseInt(hex.slice(0, 2), 16) / 255;
+      const g = parseInt(hex.slice(2, 4), 16) / 255;
+      const b = parseInt(hex.slice(4, 6), 16) / 255;
+      if (!isNaN(r) && !isNaN(g) && !isNaN(b)) return rgb(r, g, b);
+    }
+    if (col === "black") return rgb(0, 0, 0);
+    if (col === "blue") return rgb(0.145, 0.388, 0.922);
+    if (col === "red") return rgb(0.863, 0.149, 0.149);
+    if (col === "green") return rgb(0.086, 0.639, 0.29);
+    if (col === "white") return rgb(1, 1, 1);
+    return rgb(0.2, 0.25, 0.33);
+  };
+
+  const toRoman = (num: number): string => {
+    if (num <= 0 || num > 3999) return String(num);
+    const lookup: [number, string][] = [
+      [1000, "M"], [900, "CM"], [500, "D"], [400, "CD"],
+      [100, "C"], [90, "XC"], [50, "L"], [40, "XL"],
+      [10, "X"], [9, "IX"], [5, "V"], [4, "IV"], [1, "I"]
+    ];
+    let result = "";
+    let n = num;
+    for (const [val, roman] of lookup) {
+      while (n >= val) {
+        result += roman;
+        n -= val;
+      }
+    }
+    return result;
   };
 
   // Helper string for page number display
@@ -1007,9 +1043,14 @@ export function EditModal({ isOpen, onClose, tool }: EditModalProps) {
 
     if (pageNumberFormat === "page-x-of-y") return `Page ${displayNum} of ${totalDisplayPages}`;
     if (pageNumberFormat === "page-x") return `Page ${displayNum}`;
+    if (pageNumberFormat === "x-only") return `${displayNum}`;
     if (pageNumberFormat === "dash-x-dash") return `- ${displayNum} -`;
     if (pageNumberFormat === "x-slash-y") return `${displayNum} / ${totalDisplayPages}`;
-    return `${displayNum}`;
+    if (pageNumberFormat === "bracket-x") return `[ ${displayNum} ]`;
+    if (pageNumberFormat === "pg-x") return `Pg. ${displayNum}`;
+    if (pageNumberFormat === "roman-lower") return toRoman(displayNum).toLowerCase();
+    if (pageNumberFormat === "roman-upper") return toRoman(displayNum);
+    return `Page ${displayNum} of ${totalDisplayPages}`;
   };
 
   // Active selected text item
@@ -1474,49 +1515,63 @@ export function EditModal({ isOpen, onClose, tool }: EditModalProps) {
 
             {/* Format & Typography */}
             <div className="flex flex-wrap items-center gap-3 text-xs">
-              <div className="flex items-center gap-2 bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-700/50">
-                <span className="text-[11px] text-slate-400">Format:</span>
-                <select
-                  value={pageNumberFormat}
-                  onChange={(e: any) => setPageNumberFormat(e.target.value)}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white focus:outline-none"
-                >
-                  <option value="page-x-of-y">Page 1 of {pageCount}</option>
-                  <option value="page-x">Page 1</option>
-                  <option value="x-only">1 (Number only)</option>
-                  <option value="x-slash-y">1 / {pageCount}</option>
-                  <option value="dash-x-dash">- 1 -</option>
-                </select>
+              <div className="flex items-center gap-2 bg-slate-900/60 px-2.5 py-1 rounded-xl border border-slate-700/50">
+                <span className="text-[11px] text-slate-400 shrink-0">Format:</span>
+                <div className="w-36">
+                  <CustomSelect
+                    value={pageNumberFormat}
+                    onChange={(v: any) => setPageNumberFormat(v)}
+                    variant="dark"
+                    size="sm"
+                    options={[
+                      { value: "page-x-of-y", label: `Page 1 of ${pageCount}` },
+                      { value: "page-x", label: "Page 1" },
+                      { value: "x-only", label: "1 (Number only)" },
+                      { value: "x-slash-y", label: `1 / ${pageCount}` },
+                      { value: "dash-x-dash", label: "- 1 -" },
+                      { value: "bracket-x", label: "[ 1 ]" },
+                      { value: "pg-x", label: "Pg. 1" },
+                      { value: "roman-lower", label: "i, ii, iii (Roman)" },
+                      { value: "roman-upper", label: "I, II, III (ROMAN)" },
+                    ]}
+                  />
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-700/50">
-                <span className="text-[11px] text-slate-400">Size:</span>
-                <select
-                  value={pageNumberFontSize}
-                  onChange={(e) => setPageNumberFontSize(parseInt(e.target.value, 10))}
-                  className="bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-white"
-                >
-                  <option value={9}>9 pt</option>
-                  <option value={11}>11 pt (Standard)</option>
-                  <option value={13}>13 pt (Large)</option>
-                  <option value={16}>16 pt</option>
-                </select>
+              <div className="flex items-center gap-2 bg-slate-900/60 px-2.5 py-1 rounded-xl border border-slate-700/50">
+                <span className="text-[11px] text-slate-400 shrink-0">Size:</span>
+                <div className="w-24">
+                  <CustomSelect
+                    value={String(pageNumberFontSize)}
+                    onChange={(v) => setPageNumberFontSize(parseInt(v, 10))}
+                    variant="dark"
+                    size="sm"
+                    options={[
+                      { value: "9", label: "9 pt" },
+                      { value: "11", label: "11 pt" },
+                      { value: "13", label: "13 pt" },
+                      { value: "16", label: "16 pt" },
+                    ]}
+                  />
+                </div>
               </div>
 
               <div className="flex items-center gap-1.5 bg-slate-900/60 px-3 py-1.5 rounded-xl border border-slate-700/50">
                 <span className="text-[11px] text-slate-400">Color:</span>
                 {[
-                  { name: "Slate", color: "#334155" },
-                  { name: "Black", color: "#000000" },
-                  { name: "Blue", color: "#2563eb" },
-                  { name: "Red", color: "#dc2626" },
+                  { name: "Charcoal Slate", color: "#334155" },
+                  { name: "Neutral Gray", color: "#64748b" },
+                  { name: "Solid Black", color: "#000000" },
+                  { name: "Royal Blue", color: "#2563eb" },
+                  { name: "Crimson Red", color: "#dc2626" },
+                  { name: "Emerald Green", color: "#16a34a" },
                 ].map((c) => (
                   <button
                     key={c.color}
                     type="button"
                     onClick={() => setPageNumberColor(c.color)}
-                    className={`w-4 h-4 rounded-full border ${
-                      pageNumberColor === c.color ? "ring-2 ring-white scale-110" : "border-slate-600"
+                    className={`w-4 h-4 rounded-full border transition ${
+                      pageNumberColor === c.color ? "ring-2 ring-indigo-400 scale-125 border-white shadow-xs" : "border-slate-500 hover:scale-110"
                     }`}
                     style={{ backgroundColor: c.color }}
                     title={c.name}
@@ -1623,18 +1678,15 @@ export function EditModal({ isOpen, onClose, tool }: EditModalProps) {
                         : "top-5 right-8"
                     }`}
                   >
-                    <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg border border-indigo-500/60 bg-indigo-50/95 shadow-lg backdrop-blur-xs ring-2 ring-indigo-500/20 animate-in fade-in duration-200">
+                    <div className="px-2 py-0.5 rounded transition">
                       <span
-                        className="font-semibold tracking-wide"
+                        className="font-medium tracking-normal select-none"
                         style={{
                           fontSize: `${Math.round(pageNumberFontSize * zoomScale)}px`,
                           color: pageNumberColor,
                         }}
                       >
                         {getPageNumberString(currentPage)}
-                      </span>
-                      <span className="text-[9px] bg-indigo-600 text-white font-sans font-bold px-1.5 py-0.5 rounded uppercase tracking-wider">
-                        Live Preview
                       </span>
                     </div>
                   </div>

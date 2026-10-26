@@ -1296,11 +1296,16 @@ export async function aiDraftXlsx(params: {
         {
           role: "system",
           content: `You are an Excel spreadsheet architect. Design a structured workbook table for "${title}".
-Create appropriate columns and 4-6 realistic sample rows with calculations/numbers where appropriate.
+CRITICAL INSTRUCTIONS:
+1. If the user specifies explicit column names, count, or specific rows/values in their prompt, you MUST follow them strictly. Do NOT invent extra columns (like "Status", "Total", "Price", or "Quantity") unless requested.
+2. If the user lists specific items or rows (e.g. "order id, name, rupee. 1. milk 100 2. bread 400"), generate EXACTLY the requested columns and rows matching those entries.
+3. If no specific columns are listed, create 3 to 5 realistic, relevant columns and 3 to 5 realistic sample rows.
+4. Cleanly normalize keys: Use lowercase alphanumeric with underscores for "key" (e.g., "order_id", "name", "rupees").
+
 Return valid JSON only matching:
 {
   "title": "${title}",
-  "sheetName": "Summary",
+  "sheetName": "Sheet1",
   "columns": [
     { "header": "Column Header", "key": "col_key", "width": 20 }
   ],
@@ -1312,12 +1317,14 @@ Return valid JSON only matching:
         { role: "user", content: `Requirements: ${prompt || title}` },
       ],
       1200,
-      0.2
+      0.1
     );
 
     const jsonStr = response.replace(/^```json\s*/i, "").replace(/\s*```$/, "").trim();
     const parsed = JSON.parse(jsonStr);
-    if (parsed.columns && parsed.rows) return parsed;
+    if (parsed.columns && Array.isArray(parsed.columns) && parsed.rows && Array.isArray(parsed.rows)) {
+      return parsed;
+    }
   } catch (e) {
     // Fallback
   }

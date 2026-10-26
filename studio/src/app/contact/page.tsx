@@ -42,13 +42,12 @@ export default function ContactPage() {
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5 group">
+          <Link href="/" className="flex items-center group py-1">
             <img
-              src="/brand/xswtools_logo.png"
-              alt="xswtools"
-              className="h-9 w-auto object-contain transition-transform group-hover:scale-105"
+              src="/logo-full.png?v=10"
+              alt="XSWTOOLS"
+              className="h-10 sm:h-11 md:h-12 w-auto object-contain transition-transform group-hover:scale-105"
             />
-            <span className="font-extrabold text-xl text-slate-900 tracking-tight">xswtools</span>
           </Link>
           <div className="flex items-center gap-3">
             <Link
@@ -310,9 +309,12 @@ export default function ContactPage() {
             <span className="font-bold text-slate-900">xswtools</span>
             <span className="font-semibold text-slate-700">&bull; &copy; {new Date().getFullYear()} All rights reserved.</span>
           </div>
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
             <Link href="/" className="hover:text-slate-900 transition">Home</Link>
             <Link href="/privacy" className="hover:text-slate-900 transition">Privacy Policy</Link>
+            <Link href="/data-safety" className="hover:text-slate-900 transition">Data Safety</Link>
+            <Link href="/terms" className="hover:text-slate-900 transition">Terms &amp; Conditions</Link>
+            <Link href="/cookies" className="hover:text-slate-900 transition">Cookie Policy</Link>
             <Link href="/contact" className="hover:text-slate-900 font-semibold text-[#3bb1df] transition">Contact Us</Link>
             <Link href="/app/help" className="hover:text-slate-900 transition">Help Center</Link>
           </div>

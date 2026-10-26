@@ -1,11 +1,6 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -36,11 +31,10 @@ export const metadata: Metadata = {
   ],
   icons: {
     icon: [
-      { url: "/favicon.ico" },
-      { url: "/favicon.png", type: "image/png" },
+      { url: "/logo-spheres.png?v=final", type: "image/png" },
     ],
-    shortcut: "/favicon.png",
-    apple: "/favicon.png",
+    shortcut: "/logo-spheres.png?v=final",
+    apple: "/logo-spheres.png?v=final",
   },
   openGraph: {
     title: "XSW Tools | Every Tool. One Workspace.",
@@ -59,9 +53,29 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistMono.variable} h-full antialiased font-sans`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <head>
+        <link rel="icon" type="image/png" href="/logo-spheres.png?v=final" />
+        <link rel="shortcut icon" href="/logo-spheres.png?v=final" />
+        <link rel="apple-touch-icon" href="/logo-spheres.png?v=final" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var h=document.head;var l=document.createElement('link');l.rel='icon';l.type='image/png';l.href='/logo-spheres.png?v='+Date.now();h.appendChild(l);}catch(e){}})();`,
+          }}
+        />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@1..144,100..1000&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );
 }

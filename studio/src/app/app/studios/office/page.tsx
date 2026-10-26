@@ -1059,24 +1059,27 @@ export default function OfficeStudioPage() {
                       </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-3">
                       <div>
-                        <label className="font-semibold text-slate-700 block mb-1">Workbook Title</label>
+                        <label className="font-semibold text-slate-700 block mb-1 text-xs">Workbook Title</label>
                         <input
                           type="text"
                           value={xlsxTitle}
                           onChange={(e) => setXlsxTitle(e.target.value)}
-                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
+                          className="w-full px-3.5 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </div>
                       <div>
-                        <label className="font-semibold text-slate-700 block mb-1">Data Requirements</label>
-                        <input
-                          type="text"
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="font-semibold text-slate-700 text-xs">Data Requirements &amp; Table Specifications</label>
+                          <span className="text-[11px] text-slate-400">Specify columns, exact values, or descriptive prompt</span>
+                        </div>
+                        <textarea
+                          rows={3}
                           value={xlsxPrompt}
                           onChange={(e) => setXlsxPrompt(e.target.value)}
-                          className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl"
-                          placeholder="Describe what data to generate..."
+                          className="w-full px-3.5 py-2.5 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-y leading-relaxed font-normal"
+                          placeholder="e.g. Columns: Order ID, Name, Rupees&#10;Row 1: ORD-001, Milk, 100&#10;Row 2: ORD-002, Bread, 400"
                         />
                       </div>
                     </div>

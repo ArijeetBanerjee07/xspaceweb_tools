@@ -36,6 +36,7 @@ import {
 } from "react-icons/lu";
 import { UpgradeCheckoutModal } from "@/components/studio/UpgradeCheckoutModal";
 import { useProStatus } from "@/lib/gating";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 export interface AiDocTool {
   id: string;
@@ -164,7 +165,20 @@ const AI_DOC_TOOLS: AiDocTool[] = [
 function FormattedMessage({ content }: { content: string }) {
   if (!content) return null;
 
-  const lines = content.split("\n");
+  // Clean raw HTML artifacts from AI responses: convert <br>, <hr>, <b>, <i>, etc. into Markdown
+  const cleanContent = content
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<hr\s*\/?>/gi, "\n---\n")
+    .replace(/<\/?(b|strong)>/gi, "**")
+    .replace(/<\/?(i|em)>/gi, "*")
+    .replace(/<\/?(p|div)>/gi, "\n")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"');
+
+  const lines = cleanContent.split("\n");
   const blocks: ReactNode[] = [];
   let currentList: ReactNode[] = [];
   let currentTableLines: string[] = [];
@@ -181,15 +195,17 @@ function FormattedMessage({ content }: { content: string }) {
   };
 
   const renderInline = (text: string): ReactNode[] => {
+    // Strip any remaining unwanted inline HTML tags
+    const sanitized = text.replace(/<\/?[a-z0-9_-]+(\s+[^>]*)?>/gi, "");
     const parts: ReactNode[] = [];
     const tokenRegex = /(\*\*[^*]+?\*\*|\[Page\s*\d+(?:-\d+)?\]|`[^`]+?`|\*[^*]+?\*)/g;
     let lastIdx = 0;
     let match: RegExpExecArray | null;
     let k = 0;
 
-    while ((match = tokenRegex.exec(text)) !== null) {
+    while ((match = tokenRegex.exec(sanitized)) !== null) {
       if (match.index > lastIdx) {
-        parts.push(text.substring(lastIdx, match.index));
+        parts.push(sanitized.substring(lastIdx, match.index));
       }
       const token = match[0];
       if (token.startsWith("**") && token.endsWith("**")) {
@@ -1847,24 +1863,24 @@ OBLIGATIONS & ACTION ITEMS
                         </button>
                       ))}
                     </div>
-                    <select
+                    <CustomSelect
                       value={targetLanguage}
-                      onChange={(e) => setTargetLanguage(e.target.value)}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white text-xs"
-                    >
-                      <option value="Hindi">Hindi (हिन्दी)</option>
-                      <option value="Spanish">Spanish (Español)</option>
-                      <option value="French">French (Français)</option>
-                      <option value="German">German (Deutsch)</option>
-                      <option value="Tamil">Tamil (தமிழ்)</option>
-                      <option value="Telugu">Telugu (తెలుగు)</option>
-                      <option value="Arabic">Arabic (العربية)</option>
-                      <option value="Japanese">Japanese (日本語)</option>
-                      <option value="Simplified Chinese">Simplified Chinese (简体中文)</option>
-                      <option value="Russian">Russian (Русский)</option>
-                      <option value="Portuguese">Portuguese (Português)</option>
-                      <option value="Italian">Italian (Italiano)</option>
-                    </select>
+                      onChange={setTargetLanguage}
+                      options={[
+                        { value: "Hindi", label: "Hindi (हिन्दी)" },
+                        { value: "Spanish", label: "Spanish (Español)" },
+                        { value: "French", label: "French (Français)" },
+                        { value: "German", label: "German (Deutsch)" },
+                        { value: "Tamil", label: "Tamil (தமிழ்)" },
+                        { value: "Telugu", label: "Telugu (తెలుగు)" },
+                        { value: "Arabic", label: "Arabic (العربية)" },
+                        { value: "Japanese", label: "Japanese (日本語)" },
+                        { value: "Simplified Chinese", label: "Simplified Chinese (简体中文)" },
+                        { value: "Russian", label: "Russian (Русский)" },
+                        { value: "Portuguese", label: "Portuguese (Português)" },
+                        { value: "Italian", label: "Italian (Italiano)" },
+                      ]}
+                    />
                   </div>
 
                   {outputResult?.translatedText && (
@@ -1947,29 +1963,29 @@ OBLIGATIONS & ACTION ITEMS
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="font-semibold text-slate-700 block mb-1">Target Tone</label>
-                      <select
+                      <label className="font-semibold text-slate-700 block mb-1 text-xs">Target Tone</label>
+                      <CustomSelect
                         value={rewriteTone}
-                        onChange={(e) => setRewriteTone(e.target.value)}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
-                      >
-                        <option value="Executive & Polished">Executive &amp; Polished</option>
-                        <option value="Concise & Plain Language">Concise &amp; Plain Language</option>
-                        <option value="Formal Legal">Formal Legal</option>
-                        <option value="Friendly & Professional">Friendly &amp; Professional</option>
-                      </select>
+                        onChange={setRewriteTone}
+                        options={[
+                          { value: "Executive & Polished", label: "Executive & Polished", description: "C-suite, board summaries & investor decks" },
+                          { value: "Concise & Plain Language", label: "Concise & Plain Language", description: "Direct, scannable & easy-to-read prose" },
+                          { value: "Formal Legal", label: "Formal Legal", description: "Standard contracts, agreements & compliance" },
+                          { value: "Friendly & Professional", label: "Friendly & Professional", description: "Engaging, collaborative & modern workplace" },
+                        ]}
+                      />
                     </div>
                     <div>
-                      <label className="font-semibold text-slate-700 block mb-1">Reading Level</label>
-                      <select
+                      <label className="font-semibold text-slate-700 block mb-1 text-xs">Reading Level</label>
+                      <CustomSelect
                         value={rewriteReadingLevel}
-                        onChange={(e) => setRewriteReadingLevel(e.target.value)}
-                        className="w-full px-3 py-2 border border-slate-200 rounded-xl bg-white"
-                      >
-                        <option value="Standard Business">Standard Business</option>
-                        <option value="Simple / Elementary">Simple / Non-technical</option>
-                        <option value="Advanced / Scholarly">Advanced / Rigorous</option>
-                      </select>
+                        onChange={setRewriteReadingLevel}
+                        options={[
+                          { value: "Standard Business", label: "Standard Business", description: "General professional audience" },
+                          { value: "Simple / Elementary", label: "Simple / Non-technical", description: "Clear for non-experts & general public" },
+                          { value: "Advanced / Scholarly", label: "Advanced / Rigorous", description: "Technical, academic & institutional depth" },
+                        ]}
+                      />
                     </div>
                   </div>
 

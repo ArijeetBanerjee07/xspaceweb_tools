@@ -34,6 +34,7 @@ const VALID_ACTIONS: ConvertAction[] = [
   "ppt-to-pdf",
   "pdf-to-images",
   "images-to-pdf",
+  "pdf-to-text",
 ];
 
 export async function POST(req: NextRequest) {

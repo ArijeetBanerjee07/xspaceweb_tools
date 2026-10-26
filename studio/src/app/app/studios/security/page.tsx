@@ -35,6 +35,7 @@ import {
 } from "react-icons/lu";
 import { UpgradeCheckoutModal } from "@/components/studio/UpgradeCheckoutModal";
 import { useProStatus, checkClientFeatureAccess, incrementClientUsage } from "@/lib/gating";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 
 // -------------------------------------------------------------
 // SAMPLE VECTOR DOCUMENT (Instant 1-Click Testing)
@@ -228,6 +229,7 @@ export default function SecurityStudioPage() {
   const [approverRole, setApproverRole] = useState("Head of Legal & Compliance");
   const [approvalNotes, setApprovalNotes] = useState("Terms reviewed and verified compliant with enterprise security standards.");
   const [approvalPlacement, setApprovalPlacement] = useState<"top-right" | "bottom-right" | "center-watermark">("bottom-right");
+  const [approvalScope, setApprovalScope] = useState<"current" | "first" | "all">("current");
 
   // Sync typed signature to signature data URL
   useEffect(() => {
@@ -779,88 +781,96 @@ export default function SecurityStudioPage() {
       const font = await doc.embedFont(StandardFonts.Helvetica);
       const boldFont = await doc.embedFont(StandardFonts.HelveticaBold);
 
-      const page = doc.getPages()[0];
-      const { width, height } = page.getSize();
+      const allPages = doc.getPages();
+      const targetPages =
+        approvalScope === "all"
+          ? allPages
+          : approvalScope === "first"
+          ? [allPages[0]]
+          : [allPages[Math.min(currentPage - 1, allPages.length - 1)] || allPages[0]];
 
-      const stampWidth = 200;
-      const stampHeight = 65;
+      for (const page of targetPages) {
+        const { width, height } = page.getSize();
+        const stampWidth = 200;
+        const stampHeight = 65;
 
-      let posX = width - stampWidth - 40;
-      let posY = 40;
-      if (approvalPlacement === "top-right") {
-        posY = height - stampHeight - 40;
-      } else if (approvalPlacement === "center-watermark") {
-        posX = (width - stampWidth) / 2;
-        posY = (height - stampHeight) / 2;
+        let posX = width - stampWidth - 40;
+        let posY = 40;
+        if (approvalPlacement === "top-right") {
+          posY = height - stampHeight - 40;
+        } else if (approvalPlacement === "center-watermark") {
+          posX = (width - stampWidth) / 2;
+          posY = (height - stampHeight) / 2;
+        }
+
+        // Stamp border color based on status
+        let borderColor = rgb(0.05, 0.6, 0.35); // Emerald
+        let badgeBg = rgb(0.92, 0.99, 0.95);
+        if (approvalStatus === "REVIEWED") {
+          borderColor = rgb(0.15, 0.45, 0.95);
+          badgeBg = rgb(0.93, 0.96, 1);
+        } else if (approvalStatus === "LEGAL_CLEARED") {
+          borderColor = rgb(0.55, 0.2, 0.85);
+          badgeBg = rgb(0.97, 0.94, 1);
+        } else if (approvalStatus === "CONFIDENTIAL") {
+          borderColor = rgb(0.85, 0.2, 0.2);
+          badgeBg = rgb(1, 0.94, 0.94);
+        }
+
+        // Draw Stamp Box
+        page.drawRectangle({
+          x: posX,
+          y: posY,
+          width: stampWidth,
+          height: stampHeight,
+          borderWidth: 1.5,
+          borderColor,
+          color: badgeBg,
+        });
+
+        // Header Tag
+        page.drawRectangle({
+          x: posX,
+          y: posY + stampHeight - 18,
+          width: stampWidth,
+          height: 18,
+          color: borderColor,
+        });
+
+        page.drawText(`STATUS: ${approvalStatus.replace("_", " ")}`, {
+          x: posX + 10,
+          y: posY + stampHeight - 13,
+          size: 9,
+          font: boldFont,
+          color: rgb(1, 1, 1),
+        });
+
+        // Approver details
+        page.drawText(`Approver: ${approverName}`, {
+          x: posX + 8,
+          y: posY + 32,
+          size: 7.5,
+          font: boldFont,
+          color: rgb(0.1, 0.1, 0.1),
+        });
+
+        page.drawText(`Role: ${approverRole}`, {
+          x: posX + 8,
+          y: posY + 22,
+          size: 7,
+          font,
+          color: rgb(0.3, 0.3, 0.3),
+        });
+
+        const timeStr = `Date: ${new Date().toISOString().replace("T", " ").substring(0, 16)} UTC`;
+        page.drawText(timeStr, {
+          x: posX + 8,
+          y: posY + 12,
+          size: 6.5,
+          font,
+          color: rgb(0.4, 0.4, 0.4),
+        });
       }
-
-      // Stamp border color based on status
-      let borderColor = rgb(0.05, 0.6, 0.35); // Emerald
-      let badgeBg = rgb(0.92, 0.99, 0.95);
-      if (approvalStatus === "REVIEWED") {
-        borderColor = rgb(0.15, 0.45, 0.95);
-        badgeBg = rgb(0.93, 0.96, 1);
-      } else if (approvalStatus === "LEGAL_CLEARED") {
-        borderColor = rgb(0.55, 0.2, 0.85);
-        badgeBg = rgb(0.97, 0.94, 1);
-      } else if (approvalStatus === "CONFIDENTIAL") {
-        borderColor = rgb(0.85, 0.2, 0.2);
-        badgeBg = rgb(1, 0.94, 0.94);
-      }
-
-      // Draw Stamp Box
-      page.drawRectangle({
-        x: posX,
-        y: posY,
-        width: stampWidth,
-        height: stampHeight,
-        borderWidth: 1.5,
-        borderColor,
-        color: badgeBg,
-      });
-
-      // Header Tag
-      page.drawRectangle({
-        x: posX,
-        y: posY + stampHeight - 18,
-        width: stampWidth,
-        height: 18,
-        color: borderColor,
-      });
-
-      page.drawText(`STATUS: ${approvalStatus.replace("_", " ")}`, {
-        x: posX + 10,
-        y: posY + stampHeight - 13,
-        size: 9,
-        font: boldFont,
-        color: rgb(1, 1, 1),
-      });
-
-      // Approver details
-      page.drawText(`Approver: ${approverName}`, {
-        x: posX + 8,
-        y: posY + 32,
-        size: 7.5,
-        font: boldFont,
-        color: rgb(0.1, 0.1, 0.1),
-      });
-
-      page.drawText(`Role: ${approverRole}`, {
-        x: posX + 8,
-        y: posY + 22,
-        size: 7,
-        font,
-        color: rgb(0.3, 0.3, 0.3),
-      });
-
-      const timeStr = `Date: ${new Date().toISOString().replace("T", " ").substring(0, 16)} UTC`;
-      page.drawText(timeStr, {
-        x: posX + 8,
-        y: posY + 12,
-        size: 6.5,
-        font,
-        color: rgb(0.4, 0.4, 0.4),
-      });
 
       const pdfBytes = await doc.save();
       const blob = new Blob([pdfBytes as Uint8Array<ArrayBuffer>], { type: "application/pdf" });
@@ -1364,9 +1374,10 @@ export default function SecurityStudioPage() {
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
-                      {showPassword ? <LuEyeOff className="w-4 h-4" /> : <LuEye className="w-4 h-4" />}
+                      {showPassword ? <LuEyeOff className="w-4 h-4 pointer-events-none" /> : <LuEye className="w-4 h-4 pointer-events-none" />}
                     </button>
                   </div>
                 </div>
@@ -1375,13 +1386,23 @@ export default function SecurityStudioPage() {
                   <>
                     <div>
                       <label className="text-xs font-semibold text-slate-700">Confirm Password</label>
-                      <input
-                        type={showPassword ? "text" : "password"}
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="••••••••••••"
-                        className="w-full mt-1 px-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      />
+                      <div className="relative mt-1">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="••••••••••••"
+                          className="w-full pr-10 pl-3 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 cursor-pointer"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? <LuEyeOff className="w-4 h-4 pointer-events-none" /> : <LuEye className="w-4 h-4 pointer-events-none" />}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="pt-2 border-t border-slate-100 space-y-2">
@@ -1643,17 +1664,33 @@ export default function SecurityStudioPage() {
                   />
                 </div>
 
-                <div>
-                  <label className="text-xs font-semibold text-slate-700">Stamp Placement</label>
-                  <select
-                    value={approvalPlacement}
-                    onChange={(e) => setApprovalPlacement(e.target.value as any)}
-                    className="w-full mt-1 px-3 py-2 text-xs rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  >
-                    <option value="bottom-right">Bottom Right Footer</option>
-                    <option value="top-right">Top Right Header</option>
-                    <option value="center-watermark">Center Stamp</option>
-                  </select>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">Stamp Placement</label>
+                    <CustomSelect
+                      value={approvalPlacement}
+                      onChange={(v: any) => setApprovalPlacement(v)}
+                      size="sm"
+                      options={[
+                        { value: "bottom-right", label: "Bottom Right" },
+                        { value: "top-right", label: "Top Right" },
+                        { value: "center-watermark", label: "Center Watermark" },
+                      ]}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">Apply To Page</label>
+                    <CustomSelect
+                      value={approvalScope}
+                      onChange={(v: any) => setApprovalScope(v)}
+                      size="sm"
+                      options={[
+                        { value: "current", label: `Current (Pg. ${currentPage})` },
+                        { value: "first", label: "First Page (Cover)" },
+                        { value: "all", label: `All (${pageCount} Pages)` },
+                      ]}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -1724,6 +1761,66 @@ export default function SecurityStudioPage() {
                         Drop Signature Here
                       </div>
                       <div className="w-2 h-2 bg-emerald-600 rotate-45 -mt-1" />
+                    </div>
+                  )}
+
+                  {/* Live Visual Indicator for Document Approval Stamp */}
+                  {activeTab === "approvals" && (
+                    <div
+                      className={`absolute pointer-events-none transition-all duration-300 z-20 ${
+                        approvalPlacement === "bottom-right"
+                          ? "bottom-6 right-6"
+                          : approvalPlacement === "top-right"
+                          ? "top-6 right-6"
+                          : "top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+                      }`}
+                    >
+                      {(() => {
+                        const isConfidential = approvalStatus === "CONFIDENTIAL";
+                        const isLegal = approvalStatus === "LEGAL_CLEARED";
+                        const isReviewed = approvalStatus === "REVIEWED";
+                        const statusColor = isConfidential
+                          ? "border-rose-500 bg-rose-50/95 text-rose-800"
+                          : isLegal
+                          ? "border-purple-500 bg-purple-50/95 text-purple-800"
+                          : isReviewed
+                          ? "border-blue-500 bg-blue-50/95 text-blue-800"
+                          : "border-emerald-600 bg-emerald-50/95 text-emerald-800";
+                        const tagBg = isConfidential
+                          ? "bg-rose-600"
+                          : isLegal
+                          ? "bg-purple-600"
+                          : isReviewed
+                          ? "bg-blue-600"
+                          : "bg-emerald-600";
+
+                        return (
+                          <div
+                            className={`w-52 rounded-xl border-2 p-2.5 shadow-xl backdrop-blur-xs ring-2 ring-black/5 animate-in fade-in zoom-in-95 duration-150 ${statusColor}`}
+                          >
+                            <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                              <span
+                                className={`px-2 py-0.5 rounded text-[10px] font-black tracking-wider text-white uppercase shadow-2xs ${tagBg}`}
+                              >
+                                {approvalStatus.replace("_", " ")}
+                              </span>
+                              <span className="text-[9px] font-bold text-slate-500 uppercase tracking-tight">
+                                Verified
+                              </span>
+                            </div>
+                            <div className="text-[11px] font-bold text-slate-900 truncate">
+                              {approverName || "Approver"}
+                            </div>
+                            <div className="text-[10px] text-slate-600 font-medium truncate">
+                              {approverRole || "Signatory Authority"}
+                            </div>
+                            <div className="mt-1 pt-1 border-t border-slate-300/60 flex items-center justify-between text-[9px] text-slate-500">
+                              <span>Security Studio Verified</span>
+                              <span className="font-mono">{new Date().toISOString().slice(0, 10)}</span>
+                            </div>
+                          </div>
+                        );
+                      })()}
                     </div>
                   )}
                 </>
