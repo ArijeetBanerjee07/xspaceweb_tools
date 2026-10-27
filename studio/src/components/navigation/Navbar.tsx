@@ -267,7 +267,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
           {isUserLoggedIn ? (
             <Link
               href="/app"
-              className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#1c1d22] hover:bg-black text-white font-semibold text-xs sm:text-sm shadow-md transition active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 px-3 sm:px-5 py-2 rounded-full bg-[#1c1d22] hover:bg-black text-white font-semibold text-xs sm:text-sm shadow-md transition active:scale-[0.98]"
             >
               <span>Workspace</span>
               <LuArrowRight className="w-3.5 h-3.5" />
@@ -276,13 +276,13 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             <>
               <Link
                 href="/login"
-                className="text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-lg transition"
+                className="hidden sm:inline-flex text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-900 px-3 py-1.5 rounded-lg transition"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="inline-flex items-center px-5 py-2 rounded-full bg-[#1c1d22] hover:bg-black text-white font-semibold text-xs sm:text-sm shadow-md transition active:scale-[0.98]"
+                className="hidden sm:inline-flex items-center px-4 sm:px-5 py-2 rounded-full bg-[#1c1d22] hover:bg-black text-white font-semibold text-xs sm:text-sm shadow-md transition active:scale-[0.98]"
               >
                 Get started
               </Link>
@@ -293,7 +293,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
           <Link
             href="/app"
             title="Launch all studios"
-            className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition ml-0.5 cursor-pointer"
+            className="hidden xs:inline-flex p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition ml-0.5 cursor-pointer"
           >
             <LuLayoutGrid className="w-5 h-5" />
           </Link>
@@ -399,7 +399,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                 {categoryIcons[category.name]}
                 <span>{category.name}</span>
               </div>
-              <div className="grid grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-1 xs:grid-cols-2 gap-1.5">
                 {category.tools.map((tool) => {
                   const isAi = AI_TOOL_SLUGS.has(tool.slug);
                   const href = getToolLink(tool.slug, isUserLoggedIn);
@@ -424,20 +424,33 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
           ))}
 
           <div className="pt-4 border-t border-slate-100 flex flex-col gap-2">
-            <Link
-              href="/login"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-slate-800 font-semibold text-sm"
-            >
-              Login
-            </Link>
-            <Link
-              href="/signup"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm shadow-xs"
-            >
-              Sign up
-            </Link>
+            {isUserLoggedIn ? (
+              <Link
+                href="/app"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm shadow-xs flex items-center justify-center gap-1.5"
+              >
+                <span>Go to Workspace</span>
+                <LuArrowRight className="w-4 h-4" />
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 rounded-xl border border-slate-200 text-slate-800 font-semibold text-sm"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 rounded-xl bg-blue-600 text-white font-semibold text-sm shadow-xs"
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

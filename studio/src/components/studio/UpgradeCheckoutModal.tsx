@@ -185,8 +185,8 @@ export function UpgradeCheckoutModal({ isOpen, onClose, highlightFeature }: Upgr
   const proBilledTotal = billingCycle === "yearly" ? "₹2,499 / year" : "₹299 / month";
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999] w-screen h-[100dvh] min-h-screen bg-slate-950/60 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto animate-in fade-in duration-200">
-      <div className="relative w-full max-w-3xl bg-white/95 backdrop-blur-2xl rounded-3xl border border-slate-200/80 shadow-2xl overflow-hidden p-6 sm:p-8">
+    <div className="fixed inset-0 z-[99999] w-screen h-[100dvh] min-h-screen bg-slate-950/60 backdrop-blur-md flex items-start sm:items-center justify-center p-3 sm:p-6 overflow-y-auto animate-in fade-in duration-200">
+      <div className="relative w-full max-w-3xl my-auto bg-white/95 backdrop-blur-2xl rounded-3xl border border-slate-200/80 shadow-2xl overflow-hidden p-5 sm:p-8">
         {/* Ambient background glow */}
         <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-gradient-to-br from-blue-400/20 via-indigo-400/15 to-purple-400/20 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-gradient-to-tr from-amber-300/15 to-rose-400/10 blur-3xl pointer-events-none" />

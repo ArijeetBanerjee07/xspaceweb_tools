@@ -543,7 +543,7 @@ export function WorkspaceDashboard({
 
           {/* Bar Chart Visualizer */}
           <div className="space-y-3">
-            <div className="h-44 flex items-end justify-between gap-3 pt-4 px-2 border-b border-slate-100">
+            <div className="h-44 flex items-end justify-between gap-1.5 sm:gap-3 pt-4 px-1 sm:px-2 border-b border-slate-100 overflow-x-auto no-scrollbar">
               {activePoints.map((pt) => {
                 const isHovered = hoveredPoint?.label === pt.label;
                 return (

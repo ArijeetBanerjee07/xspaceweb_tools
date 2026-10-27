@@ -2750,7 +2750,7 @@ export function ToolRunnerClient({ tool, isAuthenticated = false }: ToolRunnerCl
       {/* Top Mega-Menu Navbar */}
       <Navbar isAuthenticated={isAuthenticated} />
 
-      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-3.5 sm:px-6 lg:px-8 py-6 sm:py-12 flex flex-col">
         {/* ================= STUDIO HEADER BANNER ================= */}
         <div className="mb-8">
           {/* Breadcrumb Navigation */}
@@ -2799,18 +2799,18 @@ export function ToolRunnerClient({ tool, isAuthenticated = false }: ToolRunnerCl
         {/* ================= CENTRAL WORKSTATION CARD ================= */}
         <div className="bg-white/95 backdrop-blur-xl border border-slate-200/90 rounded-3xl shadow-xl shadow-slate-200/40 overflow-hidden mb-12">
           {/* Workstation Top Action Strip */}
-          <div className="px-6 py-4 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50/80 border-b border-slate-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-[#3bb1df] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-[#3bb1df] text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
                 <LuFileText className="w-4 h-4" />
               </div>
-              <div>
-                <div className="text-xs font-bold text-slate-800">{tool.name} Workstation</div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold text-slate-800 truncate">{tool.name} Workstation</div>
                 <div className="text-[10px] text-slate-400">Client-Side Engine Active</div>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 shrink-0">
               {stage === "upload" && (
                 <span className="text-[11px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200/70">
                   Step 1: Choose File
@@ -2830,7 +2830,7 @@ export function ToolRunnerClient({ tool, isAuthenticated = false }: ToolRunnerCl
           </div>
 
           {/* Workstation Body */}
-          <div className="p-6 sm:p-8">
+          <div className="p-4 sm:p-8">
             {/* STAGE 1: UPLOAD VIEW */}
             {stage === "upload" && (
               <div className="flex flex-col items-center">
@@ -2849,7 +2849,7 @@ export function ToolRunnerClient({ tool, isAuthenticated = false }: ToolRunnerCl
                   }}
                   onDragLeave={() => setIsDragging(false)}
                   onDrop={handleDrop}
-                  className={`w-full max-w-2xl border-2 border-dashed rounded-3xl p-8 sm:p-14 text-center transition-all ${
+                  className={`w-full max-w-2xl border-2 border-dashed rounded-3xl p-6 sm:p-14 text-center transition-all ${
                     isDragging
                       ? "border-[#3bb1df] bg-blue-50/70 scale-[1.01]"
                       : "border-slate-300/80 bg-slate-50/40 hover:border-blue-400 hover:bg-blue-50/20 shadow-2xs"
@@ -7629,12 +7629,12 @@ export function ToolRunnerClient({ tool, isAuthenticated = false }: ToolRunnerCl
                 </div>
 
                 {/* Download Button */}
-                <div className="flex items-center justify-center gap-3 w-full">
+                <div className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-2.5 sm:gap-3 w-full">
                   <button
                     type="button"
                     onClick={resetAll}
                     title="Process another document"
-                    className="w-12 h-12 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition shadow-2xs cursor-pointer"
+                    className="w-12 h-12 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition shadow-2xs cursor-pointer shrink-0"
                   >
                     <LuRefreshCw className="w-5 h-5 text-slate-600" />
                   </button>
@@ -7642,10 +7642,10 @@ export function ToolRunnerClient({ tool, isAuthenticated = false }: ToolRunnerCl
                   <button
                     type="button"
                     onClick={triggerDownload}
-                    className="flex-1 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 via-blue-600 to-[#3bb1df] hover:from-blue-700 hover:to-[#2ea1ce] text-white font-bold text-base shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer"
+                    className="flex-1 min-w-[200px] py-3.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 via-blue-600 to-[#3bb1df] hover:from-blue-700 hover:to-[#2ea1ce] text-white font-bold text-sm sm:text-base shadow-lg shadow-blue-500/25 transition flex items-center justify-center gap-2 active:scale-[0.99] cursor-pointer"
                   >
-                    <LuDownload className="w-5 h-5" />
-                    <span>{tool.downloadText}</span>
+                    <LuDownload className="w-5 h-5 shrink-0" />
+                    <span className="truncate">{tool.downloadText}</span>
                   </button>
 
                   <button
@@ -7655,7 +7655,7 @@ export function ToolRunnerClient({ tool, isAuthenticated = false }: ToolRunnerCl
                       navigator.clipboard.writeText(window.location.href);
                       alert("Tool link copied to clipboard!");
                     }}
-                    className="w-12 h-12 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition shadow-2xs cursor-pointer"
+                    className="w-12 h-12 rounded-xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 flex items-center justify-center transition shadow-2xs cursor-pointer shrink-0"
                   >
                     <LuShare2 className="w-5 h-5 text-slate-600" />
                   </button>

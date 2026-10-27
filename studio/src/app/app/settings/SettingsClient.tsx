@@ -302,12 +302,12 @@ export function SettingsClient({
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 pt-1">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 pt-1">
               <button
                 type="button"
                 disabled={cancelLoading}
                 onClick={handleCancelSubscription}
-                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-xs disabled:opacity-50"
+                className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition shadow-xs disabled:opacity-50 text-center"
               >
                 {cancelLoading ? "Cancelling..." : "Yes, Cancel Subscription"}
               </button>
@@ -315,7 +315,7 @@ export function SettingsClient({
                 type="button"
                 disabled={cancelLoading}
                 onClick={() => setIsConfirmingCancel(false)}
-                className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition"
+                className="px-4 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl transition text-center"
               >
                 Keep My Pro Subscription
               </button>

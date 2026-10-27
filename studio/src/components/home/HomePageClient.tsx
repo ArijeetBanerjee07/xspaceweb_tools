@@ -450,11 +450,11 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Column: Headline & Subtitle */}
           <div className="lg:col-span-6 text-left space-y-6">
-            <h1 className="text-5xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.08]">
+            <h1 className="text-4xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight text-slate-900 leading-[1.08]">
               Tools worth using.
             </h1>
 
-            <p className="text-lg sm:text-xl text-slate-600 max-w-lg font-normal leading-relaxed">
+            <p className="text-base sm:text-xl text-slate-600 max-w-lg font-normal leading-relaxed">
               A curated workspace of tools to create, convert, secure and optimize files, powered by AI.
             </p>
 
@@ -470,8 +470,8 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
           </div>
 
           {/* Right Column: Interactive Circular Orbit Illustration matching the design */}
-          <div className="lg:col-span-6 flex items-center justify-center relative select-none">
-            <div className="relative w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] lg:w-[540px] lg:h-[540px] flex items-center justify-center">
+          <div className="lg:col-span-6 flex items-center justify-center relative select-none overflow-hidden sm:overflow-visible py-4">
+            <div className="relative w-[360px] h-[360px] sm:w-[480px] sm:h-[480px] lg:w-[540px] lg:h-[540px] flex items-center justify-center scale-[0.78] xs:scale-[0.9] sm:scale-100 origin-center transition-transform">
               {/* Broad Concentric Orbit Rings (darkened slightly for clarity) */}
               <div className="absolute w-[340px] h-[340px] sm:w-[460px] sm:h-[460px] lg:w-[510px] lg:h-[510px] rounded-full border border-slate-300" />
               <div className="absolute w-[240px] h-[240px] sm:w-[330px] sm:h-[330px] lg:w-[370px] lg:h-[370px] rounded-full border border-slate-300" />
@@ -631,17 +631,17 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-8 flex flex-wrap items-center gap-3.5">
+              <div className="pt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
                 <Link
                   href={getStudioHref(activeStudio.href)}
-                  className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-[#0066ff] hover:bg-blue-700 text-white font-bold text-sm shadow-md transition"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#0066ff] hover:bg-blue-700 text-white font-bold text-sm shadow-md transition text-center"
                 >
                   <span>Open {activeStudio.name}</span>
                   <LuArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
                   href={getStudioHref("/app")}
-                  className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-sm transition"
+                  className="inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-sm transition text-center"
                 >
                   <LuExternalLink className="w-4 h-4 text-slate-500" />
                   <span>Workspace Overview</span>
@@ -1853,7 +1853,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                   e.preventDefault();
                   alert("Thank you for subscribing!");
                 }}
-                className="flex items-center gap-2 max-w-md"
+                className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 max-w-md"
               >
                 <input
                   type="email"
@@ -1863,7 +1863,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-[#1c1d22] hover:bg-black text-white text-xs font-bold transition shadow-xs"
+                  className="px-6 py-2.5 rounded-full bg-[#1c1d22] hover:bg-black text-white text-xs font-bold transition shadow-xs text-center"
                 >
                   Subscribe
                 </button>

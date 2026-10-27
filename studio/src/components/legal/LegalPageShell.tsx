@@ -64,6 +64,7 @@ export function LegalPageShell({
   const [activeSectionId, setActiveSectionId] = useState<string>(
     sections[0]?.id || ""
   );
+  const [isTocOpenMobile, setIsTocOpenMobile] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -265,17 +266,27 @@ export function LegalPageShell({
         <aside className="w-full lg:w-64 xl:w-72 shrink-0 space-y-4 self-start lg:sticky lg:top-24">
           {/* On this page box */}
           <div className="bg-white rounded-2xl border border-slate-200/90 p-4 shadow-xs">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3 px-1">
-              On this page
-            </h4>
-            <nav className="space-y-1 max-h-[60vh] overflow-y-auto pr-1">
+            <button
+              type="button"
+              onClick={() => setIsTocOpenMobile(!isTocOpenMobile)}
+              className="w-full lg:pointer-events-none flex items-center justify-between text-xs font-bold text-slate-900 uppercase tracking-wider mb-1 lg:mb-3 px-1 cursor-pointer"
+            >
+              <span>On this page ({sections.length})</span>
+              <span className="lg:hidden text-[11px] font-semibold text-blue-600 lowercase bg-blue-50 px-2 py-0.5 rounded-md">
+                {isTocOpenMobile ? "hide" : "show all"}
+              </span>
+            </button>
+            <nav className={`${isTocOpenMobile ? "block" : "hidden lg:block"} space-y-1 max-h-[60vh] overflow-y-auto pr-1 mt-2 lg:mt-0`}>
               {sections.map((sec) => {
                 const isActive = activeSectionId === sec.id;
                 return (
                   <button
                     key={sec.id}
                     type="button"
-                    onClick={() => scrollToSection(sec.id)}
+                    onClick={() => {
+                      scrollToSection(sec.id);
+                      setIsTocOpenMobile(false);
+                    }}
                     className={`w-full text-left px-2.5 py-1.5 rounded-xl text-xs transition cursor-pointer flex items-center gap-2 ${
                       isActive
                         ? "bg-blue-50 text-blue-600 font-bold shadow-2xs"

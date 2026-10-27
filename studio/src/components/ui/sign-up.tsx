@@ -321,9 +321,9 @@ export const AuthComponent = ({
       </div>
 
       {/* ================= RIGHT FORM PANEL ================= */}
-      <div className="relative flex-1 flex flex-col justify-between p-6 sm:p-8 lg:p-10 xl:p-12 bg-white overflow-y-auto">
+      <div className="relative flex-1 flex flex-col justify-between p-4 sm:p-8 lg:p-10 xl:p-12 bg-white overflow-y-auto">
         {/* Top Row Switcher */}
-        <div className="flex items-center justify-between lg:justify-end w-full mb-4">
+        <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between lg:justify-end gap-3 w-full mb-4">
           <div className="lg:hidden flex items-center gap-2">
             <div className="w-8 h-8 rounded-xl bg-white border border-blue-100 flex items-center justify-center p-1 shadow-2xs">
               <img

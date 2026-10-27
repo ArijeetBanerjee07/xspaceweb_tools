@@ -46,6 +46,11 @@ export function StudioShell({ user, workspace, role, children }: StudioShellProp
     setMounted(true);
   }, []);
 
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
   // Global Tool Search State
   const [toolSearch, setToolSearch] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -139,11 +144,19 @@ export function StudioShell({ user, workspace, role, children }: StudioShellProp
         </button>
       </div>
 
+      {/* Mobile Drawer Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="md:hidden fixed inset-0 top-[49px] bg-slate-950/60 backdrop-blur-xs z-30 animate-in fade-in"
+        />
+      )}
+
       {/* Sidebar - Dark Navy exactly as in the mockups */}
       <aside
         className={`${
-          isMobileMenuOpen ? "block" : "hidden"
-        } md:block w-full md:w-64 bg-[#0b1021] border-r border-[#1e293b]/70 flex flex-col shrink-0 z-30 transition-all`}
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        } fixed md:static inset-y-0 left-0 top-[49px] md:top-0 w-72 md:w-64 bg-[#0b1021] border-r border-[#1e293b]/70 flex flex-col shrink-0 z-40 md:z-30 transition-transform duration-200 ease-in-out`}
       >
         <div className="p-4 flex-1 flex flex-col overflow-y-auto space-y-6">
           {/* Logo & Brand Header */}
@@ -322,7 +335,7 @@ export function StudioShell({ user, workspace, role, children }: StudioShellProp
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col min-w-0 bg-[#f8fafc]">
         {/* Top Navbar */}
-        <header className="h-16 bg-white border-b border-slate-200/90 px-6 flex items-center justify-between gap-4 sticky top-0 z-20 shrink-0">
+        <header className="h-16 bg-white border-b border-slate-200/90 px-3 sm:px-6 flex items-center justify-between gap-2.5 sm:gap-4 sticky top-0 z-20 shrink-0">
           {/* Global Tool Search Bar with Dropdown */}
           <div ref={searchContainerRef} className="flex-1 max-w-xl relative">
             <div className="relative">
@@ -338,7 +351,7 @@ export function StudioShell({ user, workspace, role, children }: StudioShellProp
                   setIsSearchOpen(true);
                 }}
                 onFocus={() => setIsSearchOpen(true)}
-                placeholder="Search any tool... (Ctrl + K)"
+                placeholder="Search tools... (Ctrl + K)"
                 className="w-full pl-10 pr-9 py-2 bg-slate-100 hover:bg-slate-100/80 focus:bg-white border border-transparent focus:border-blue-400 rounded-xl text-xs text-slate-800 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-blue-100"
               />
               {toolSearch && (
@@ -520,7 +533,7 @@ export function StudioShell({ user, workspace, role, children }: StudioShellProp
         </header>
 
         {/* Child Pages (Light Canvas) */}
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto max-w-[1600px] w-full mx-auto">
+        <main className="flex-1 p-3.5 sm:p-6 md:p-8 overflow-y-auto max-w-[1600px] w-full mx-auto">
           <WorkspaceProvider value={{ user, workspace, role, isPro }}>
             {children}
           </WorkspaceProvider>
