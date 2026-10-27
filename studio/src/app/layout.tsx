@@ -76,6 +76,13 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" href="/logo-spheres.png" />
         <link rel="apple-touch-icon" href="/logo-spheres.png" />
+        <link
+          rel="preload"
+          as="image"
+          href="/logo-spheres.webp"
+          type="image/webp"
+          fetchPriority="high"
+        />
       </head>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>

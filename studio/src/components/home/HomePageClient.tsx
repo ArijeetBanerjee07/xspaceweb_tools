@@ -2,7 +2,6 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { TOOLS_CATALOG, CatalogTool } from "@/config/toolsCatalog";
 import {
   LuSparkles,
@@ -61,7 +60,7 @@ const STUDIOS_DATA = [
     tagline: "High-Performance Vector PDF Processing & OCR",
     desc: "Complete online PDF toolbox: merge multi-page documents, split pages, compress file size up to 85%, stamp watermarks, and extract editable text with neural OCR.",
     href: "/app/studios/pdf",
-    previewImage: "/studios/pdf.jpg",
+    previewImage: "/studios/pdf.webp",
     icon: LuFileText,
     badge: "10 Tools",
     badgeColor: "bg-red-50 text-red-600 border-red-200",
@@ -82,7 +81,7 @@ const STUDIOS_DATA = [
     tagline: "Neural Reading, Instant Briefs & Invoice Extraction",
     desc: "Analyze and query complex contracts, technical papers, and spreadsheets. Generate executive summaries and extract key information.",
     href: "/app/studios/ai-document",
-    previewImage: "/studios/ai-document.jpg",
+    previewImage: "/studios/ai-document.webp",
     icon: LuSparkles,
     badge: "AI Powered",
     badgeColor: "bg-purple-50 text-purple-600 border-purple-200",
@@ -103,7 +102,7 @@ const STUDIOS_DATA = [
     tagline: "Sub-Pixel AI Background Matting & Subject Cutout",
     desc: "Remove photo backgrounds automatically in 2 seconds. Replace with clean studio backgrounds and solid colors.",
     href: "/app/studios/background",
-    previewImage: "/studios/background.jpg",
+    previewImage: "/studios/background.webp",
     icon: LuScissors,
     badge: "Neural Matting",
     badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
@@ -124,7 +123,7 @@ const STUDIOS_DATA = [
     tagline: "Universal 20+ Format Transcoder & File Bridge",
     desc: "Convert effortlessly between Word, PowerPoint, Excel, PDF, Markdown, HTML, and high-resolution raster formats while preserving quality.",
     href: "/app/studios/document-hub",
-    previewImage: "/studios/document-hub.jpg",
+    previewImage: "/studios/document-hub.webp",
     icon: LuLayers,
     badge: "20+ Formats",
     badgeColor: "bg-blue-50 text-blue-600 border-blue-200",
@@ -145,7 +144,7 @@ const STUDIOS_DATA = [
     tagline: "Programmatic Word, Presentation & Spreadsheet Suite",
     desc: "Create and edit DOCX, PPTX, XLSX and CSV files online with powerful and easy-to-use tools.",
     href: "/app/studios/office",
-    previewImage: "/studios/office.jpg",
+    previewImage: "/studios/office.webp",
     icon: LuFileSpreadsheet,
     badge: "Office Suite",
     badgeColor: "bg-amber-50 text-amber-600 border-amber-200",
@@ -166,7 +165,7 @@ const STUDIOS_DATA = [
     tagline: "Cryptographic Protection, PII Redaction & Legal E-Signs",
     desc: "Encrypt, redact and sign documents securely with AES-256 encryption and advanced security tools.",
     href: "/app/studios/security",
-    previewImage: "/studios/security.jpg",
+    previewImage: "/studios/security.webp",
     icon: LuShieldCheck,
     badge: "AES-256 Safe",
     badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
@@ -187,7 +186,7 @@ const STUDIOS_DATA = [
     tagline: "Smart Density Reduction & Lossless Optimization",
     desc: "Reduce PDF and image file sizes without losing quality and enhance with AI-powered tools.",
     href: "/app/studios/compress",
-    previewImage: "/studios/compress.jpg",
+    previewImage: "/studios/compress.webp",
     icon: LuMinimize2,
     badge: "Up to -85%",
     badgeColor: "bg-amber-50 text-amber-600 border-amber-200",
@@ -208,7 +207,7 @@ const STUDIOS_DATA = [
     tagline: "Custom Vector QR Generator & Dynamic Route Engine",
     desc: "Design sharp, customized vector QR codes for websites, WiFi network logins, vCard digital business cards, and social profiles with downloadable SVG and high-DPI PNGs.",
     href: "/app/studios/qr-link",
-    previewImage: "/studios/qr-link.jpg",
+    previewImage: "/studios/qr-link.webp",
     icon: LuQrCode,
     badge: "Vector SVG",
     badgeColor: "bg-blue-50 text-blue-600 border-blue-200",
@@ -229,7 +228,7 @@ const STUDIOS_DATA = [
     tagline: "Search Volume Intelligence & Commercial Intent Radar",
     desc: "Explore search queries, keyword gaps and monitor topic momentum with AI.",
     href: "/app/studios/trendrank",
-    previewImage: "/studios/trendrank.jpg",
+    previewImage: "/studios/trendrank.webp",
     icon: LuTrendingUp,
     badge: "SEO Insights",
     badgeColor: "bg-purple-50 text-purple-600 border-purple-200",
@@ -480,10 +479,11 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
               {/* Center 4-Sphere Glossy Cluster Logo */}
               <div className="relative z-20 w-28 h-28 sm:w-36 sm:h-36 flex items-center justify-center group">
                 <img
-                  src="/logo-spheres.png?v=5"
+                  src="/logo-spheres.webp"
                   alt="XSW Tools"
                   width={128}
                   height={128}
+                  fetchPriority="high"
                   className="w-24 h-24 sm:w-32 sm:h-32 object-contain drop-shadow-[0_12px_28px_rgba(59,130,246,0.32)] group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
@@ -1259,7 +1259,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
               <div className="flex items-center justify-between pb-3 border-b border-blue-100">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-[#0066ff] text-white flex items-center justify-center font-bold">
-                    <img src="/logo.png" alt="XSW Tools" className="w-6 h-6 object-contain" />
+                    <img src="/logo.webp" alt="XSW Tools" width={24} height={24} loading="lazy" className="w-6 h-6 object-contain" />
                   </div>
                   <div>
                     <h3 className="text-base font-extrabold text-slate-900">XSW Tools</h3>
@@ -1423,8 +1423,11 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                   <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-[#0066ff] rounded-xs" />
 
                   <img
-                    src="/logo.png"
+                    src="/logo.webp"
                     alt="Image editor"
+                    width={64}
+                    height={64}
+                    loading="lazy"
                     className="w-16 h-16 object-contain drop-shadow"
                   />
                 </div>
@@ -1854,10 +1857,11 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
             <div className="lg:col-span-6 space-y-4">
               <Link href="/" className="inline-flex items-center group py-1">
                 <img
-                  src="/logo-full.png?v=10"
+                  src="/logo-full.webp"
                   alt="XSWTOOLS - Every Tool. One Workspace."
                   width={180}
                   height={56}
+                  loading="lazy"
                   className="h-12 sm:h-14 w-auto object-contain group-hover:opacity-95 transition-opacity"
                 />
               </Link>

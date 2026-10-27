@@ -152,7 +152,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center group shrink-0 py-1">
             <img
-              src="/logo-full.png?v=10"
+              src="/logo-full.webp"
               alt="XSWTOOLS - Every Tool. One Workspace."
               width={180}
               height={48}
