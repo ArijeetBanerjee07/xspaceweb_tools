@@ -154,6 +154,8 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             <img
               src="/logo-full.png?v=10"
               alt="XSWTOOLS - Every Tool. One Workspace."
+              width={180}
+              height={48}
               className="h-10 sm:h-11 md:h-12 w-auto object-contain group-hover:opacity-95 transition-opacity"
             />
           </Link>
@@ -164,6 +166,8 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             <button
               type="button"
               onClick={() => toggleMenu("pdf")}
+              aria-expanded={activeMenu === "pdf"}
+              aria-haspopup="true"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 activeMenu === "pdf"
                   ? "bg-blue-50 text-blue-600 shadow-2xs"
@@ -182,6 +186,8 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             <button
               type="button"
               onClick={() => toggleMenu("ai")}
+              aria-expanded={activeMenu === "ai"}
+              aria-haspopup="true"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 activeMenu === "ai"
                   ? "bg-blue-50 text-blue-600 shadow-2xs"
@@ -200,6 +206,8 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             <button
               type="button"
               onClick={() => toggleMenu("image")}
+              aria-expanded={activeMenu === "image"}
+              aria-haspopup="true"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 activeMenu === "image"
                   ? "bg-blue-50 text-blue-600 shadow-2xs"
@@ -218,6 +226,8 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             <button
               type="button"
               onClick={() => toggleMenu("convert")}
+              aria-expanded={activeMenu === "convert"}
+              aria-haspopup="true"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 activeMenu === "convert"
                   ? "bg-blue-50 text-blue-600 shadow-2xs"
@@ -236,6 +246,8 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
             <button
               type="button"
               onClick={() => toggleMenu("all")}
+              aria-expanded={activeMenu === "all"}
+              aria-haspopup="true"
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-all cursor-pointer ${
                 activeMenu === "all"
                   ? "bg-blue-50 text-blue-600 shadow-2xs"
@@ -293,6 +305,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
           <Link
             href="/app"
             title="Launch all studios"
+            aria-label="Launch all studios"
             className="hidden xs:inline-flex p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition ml-0.5 cursor-pointer"
           >
             <LuLayoutGrid className="w-5 h-5" />
@@ -302,7 +315,8 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Toggle mobile menu"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isMobileMenuOpen}
             className="lg:hidden p-2 text-slate-600 hover:text-slate-900 rounded-lg"
           >
             {isMobileMenuOpen ? <LuX className="w-6 h-6" /> : <LuMenu className="w-6 h-6" />}
@@ -467,6 +481,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                 type="text"
                 autoFocus
                 placeholder="Search any tool (e.g. merge, compress, jpg to pdf, watermark)..."
+                aria-label="Search tools"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 text-sm text-slate-900 placeholder:text-slate-400 outline-none"
@@ -474,7 +489,8 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
               <button
                 type="button"
                 onClick={() => setIsSearchOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg"
+                aria-label="Close search"
+                className="p-1 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
               >
                 <LuX className="w-5 h-5" />
               </button>

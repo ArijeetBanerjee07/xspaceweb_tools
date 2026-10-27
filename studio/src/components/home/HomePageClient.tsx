@@ -482,45 +482,47 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 <img
                   src="/logo-spheres.png?v=5"
                   alt="XSW Tools"
+                  width={128}
+                  height={128}
                   className="w-24 h-24 sm:w-32 sm:h-32 object-contain drop-shadow-[0_12px_28px_rgba(59,130,246,0.32)] group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
 
               {/* Orbiting Floating Cards matching the design */}
               {/* 1. PDF Card (Top Left - ~11 o'clock) */}
-              <div className="absolute top-2 left-12 sm:top-4 sm:left-20 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300 cursor-pointer">
+              <div aria-hidden="true" className="absolute top-2 left-12 sm:top-4 sm:left-20 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
                 <FaFilePdf className="w-8 h-8 sm:w-10 sm:h-10 text-[#ef4444]" />
               </div>
 
               {/* 2. AI Card (Top Right - ~1 o'clock) */}
-              <div className="absolute top-0 right-12 sm:top-2 sm:right-20 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300 cursor-pointer">
+              <div aria-hidden="true" className="absolute top-0 right-12 sm:top-2 sm:right-20 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
                 <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-[#0066ff] to-[#3b82f6] shadow-sm flex items-center justify-center text-white font-extrabold text-sm sm:text-base tracking-tight">
                   AI
                 </div>
               </div>
 
               {/* 3. Image Card (Center Right - ~3 o'clock) */}
-              <div className="absolute top-36 -right-2 sm:top-48 sm:-right-4 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300 cursor-pointer">
+              <div aria-hidden="true" className="absolute top-36 -right-2 sm:top-48 sm:-right-4 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
                 <LuImage className="w-8 h-8 sm:w-10 sm:h-10 text-[#10b981]" strokeWidth={2.2} />
               </div>
 
               {/* 4. Security Shield (Bottom Right - ~4:30 o'clock) */}
-              <div className="absolute bottom-3 right-10 sm:bottom-6 sm:right-16 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300 cursor-pointer">
+              <div aria-hidden="true" className="absolute bottom-3 right-10 sm:bottom-6 sm:right-16 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
                 <LuShieldCheck className="w-8 h-8 sm:w-10 sm:h-10 text-[#a855f7]" strokeWidth={2.2} />
               </div>
 
               {/* 5. Document Card (Bottom Center - ~6 o'clock) */}
-              <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 sm:-bottom-4 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300 cursor-pointer">
+              <div aria-hidden="true" className="absolute -bottom-3 left-1/2 -translate-x-1/2 sm:-bottom-4 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
                 <LuFileText className="w-8 h-8 sm:w-10 sm:h-10 text-[#0ea5e9]" strokeWidth={2.2} />
               </div>
 
               {/* 6. Office / Spreadsheet Card (Lower Left - marked position on outer ring - ~8 o'clock) */}
-              <div className="absolute bottom-16 left-2 sm:bottom-24 sm:left-4 lg:bottom-28 lg:left-5 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300 cursor-pointer">
+              <div aria-hidden="true" className="absolute bottom-16 left-2 sm:bottom-24 sm:left-4 lg:bottom-28 lg:left-5 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
                 <LuFileSpreadsheet className="w-8 h-8 sm:w-10 sm:h-10 text-[#f59e0b]" strokeWidth={2.2} />
               </div>
 
               {/* 7. QR Code Card (Center Left - ~9 o'clock) */}
-              <div className="absolute top-36 -left-2 sm:top-48 sm:-left-4 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300 cursor-pointer">
+              <div aria-hidden="true" className="absolute top-36 -left-2 sm:top-48 sm:-left-4 z-10 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl sm:rounded-3xl bg-white shadow-[0_12px_28px_rgba(0,0,0,0.08)] border border-slate-100 flex items-center justify-center hover:scale-110 hover:shadow-xl transition-all duration-300">
                 <LuQrCode className="w-8 h-8 sm:w-10 sm:h-10 text-slate-900" strokeWidth={2.2} />
               </div>
             </div>
@@ -544,13 +546,15 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
         </div>
 
         {/* 9 Studio Tabs - Wrapped & Centered to never cut off */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 max-w-5xl mx-auto pb-4">
+        <div role="tablist" aria-label="Production Studios" className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 max-w-5xl mx-auto pb-4">
           {STUDIOS_DATA.map((s) => {
             const Icon = s.icon;
             const isActive = s.id === activeStudioId;
             return (
               <button
                 key={s.id}
+                role="tab"
+                aria-selected={isActive}
                 onClick={() => setActiveStudioId(s.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition border ${
                   isActive
@@ -674,6 +678,10 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                     key={activeStudio.id}
                     src={activeStudio.previewImage}
                     alt={`${activeStudio.name} Interface Preview`}
+                    width={600}
+                    height={450}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                   />
                   {/* Floating Pill Overlay */}
@@ -735,6 +743,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
               ref={searchInputRef}
               type="text"
               placeholder="Search any online tool (e.g., merge pdf, compress, background cutout, ocr text)..."
+              aria-label="Search all online tools"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-20 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0066ff] focus:ring-2 focus:ring-[#0066ff]/20 shadow-sm transition"
@@ -743,7 +752,8 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
               {searchQuery ? (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="text-xs text-slate-400 hover:text-slate-700 px-1"
+                  aria-label="Clear tool search"
+                  className="text-xs text-slate-400 hover:text-slate-700 px-1 cursor-pointer"
                 >
                   Clear
                 </button>
@@ -757,12 +767,13 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
         </div>
 
         {/* Category Filter Pills with Horizontal Scroll */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-none justify-start lg:justify-center max-w-5xl mx-auto mb-10">
+        <div role="group" aria-label="Tool categories" className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-none justify-start lg:justify-center max-w-5xl mx-auto mb-10">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setSelectedCategory(cat)}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition border ${
+              aria-pressed={selectedCategory === cat}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition border cursor-pointer ${
                 selectedCategory === cat
                   ? "bg-[#0066ff] text-white border-[#0066ff] shadow-sm font-bold"
                   : "bg-white text-slate-600 hover:text-slate-900 border-slate-200 hover:bg-slate-50"
@@ -1775,6 +1786,8 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                     <button
                       type="button"
                       onClick={() => setExpandedFaq(isOpen ? null : item.id)}
+                      aria-expanded={isOpen}
+                      aria-controls={`faq-answer-${item.id}`}
                       className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-slate-900 text-sm sm:text-base hover:text-[#0066ff] transition cursor-pointer"
                     >
                       <span>{item.question}</span>
@@ -1787,7 +1800,10 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                       </div>
                     </button>
                     {isOpen && (
-                      <div className="px-5 pb-5 pt-0 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-50">
+                      <div
+                        id={`faq-answer-${item.id}`}
+                        className="px-5 pb-5 pt-0 text-xs sm:text-sm text-slate-600 leading-relaxed border-t border-slate-50"
+                      >
                         {item.answer}
                       </div>
                     )}
@@ -1840,6 +1856,8 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 <img
                   src="/logo-full.png?v=10"
                   alt="XSWTOOLS - Every Tool. One Workspace."
+                  width={180}
+                  height={56}
                   className="h-12 sm:h-14 w-auto object-contain group-hover:opacity-95 transition-opacity"
                 />
               </Link>
@@ -1859,12 +1877,13 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 <input
                   type="email"
                   placeholder="Enter your email"
+                  aria-label="Email address for newsletter"
                   required
                   className="flex-1 px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0066ff]"
                 />
                 <button
                   type="submit"
-                  className="px-6 py-2.5 rounded-full bg-[#1c1d22] hover:bg-black text-white text-xs font-bold transition shadow-xs text-center"
+                  className="px-6 py-2.5 rounded-full bg-[#1c1d22] hover:bg-black text-white text-xs font-bold transition shadow-xs text-center cursor-pointer"
                 >
                   Subscribe
                 </button>
@@ -1957,19 +1976,19 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
 
             {/* Social Icons */}
             <div className="flex items-center gap-3 text-slate-600">
-              <a href="https://youtube.com" target="_blank" rel="noreferrer" className="hover:text-red-600 transition">
+              <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on YouTube" className="hover:text-red-600 transition p-1">
                 <FaYoutube className="w-4 h-4" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="hover:text-blue-700 transition">
+              <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on LinkedIn" className="hover:text-blue-700 transition p-1">
                 <FaLinkedinIn className="w-4 h-4" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" className="hover:text-slate-900 transition">
+              <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on X (formerly Twitter)" className="hover:text-slate-900 transition p-1">
                 <FaXTwitter className="w-4 h-4" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-pink-600 transition">
+              <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on Instagram" className="hover:text-pink-600 transition p-1">
                 <FaInstagram className="w-4 h-4" />
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:text-blue-600 transition">
+              <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on Facebook" className="hover:text-blue-600 transition p-1">
                 <FaFacebookF className="w-3.5 h-3.5" />
               </a>
             </div>

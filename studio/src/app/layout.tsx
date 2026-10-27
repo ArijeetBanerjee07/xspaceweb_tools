@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist_Mono } from "next/font/google";
+import { Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -8,6 +8,12 @@ export const viewport: Viewport = {
   maximumScale: 5,
   themeColor: "#ffffff",
 };
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
@@ -56,26 +62,20 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html
       lang="en"
-      className={`${geistMono.variable} h-full antialiased font-sans`}
+      className={`${inter.variable} ${geistMono.variable} h-full antialiased font-sans`}
     >
       <head>
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link rel="icon" type="image/png" href="/logo-spheres.png" />
         <link rel="apple-touch-icon" href="/logo-spheres.png" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:opsz,wght@1..144,100..1000&display=swap"
-          rel="stylesheet"
-        />
       </head>
       <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
