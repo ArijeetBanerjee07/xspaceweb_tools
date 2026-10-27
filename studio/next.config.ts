@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
     optimizePackageImports: [
       "lucide-react",
       "react-icons",
+      "react-icons/lu",
+      "react-icons/fa6",
       "pdf-lib",
       "exceljs",
       "docx",
@@ -24,7 +26,16 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:all*(svg|jpg|png|webp|ico|woff|woff2)",
+        source: "/:path*\\.(ico|png|jpg|jpeg|svg|webp|woff|woff2|ttf)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+      },
+      {
+        source: "/studios/:path*",
         headers: [
           {
             key: "Cache-Control",

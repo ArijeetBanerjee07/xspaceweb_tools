@@ -63,14 +63,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistMono.variable} h-full antialiased font-sans`}
     >
       <head>
-        <link rel="icon" type="image/png" href="/logo-spheres.png?v=final" />
-        <link rel="shortcut icon" href="/logo-spheres.png?v=final" />
-        <link rel="apple-touch-icon" href="/logo-spheres.png?v=final" />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `(function(){try{var h=document.head;var l=document.createElement('link');l.rel='icon';l.type='image/png';l.href='/logo-spheres.png?v='+Date.now();h.appendChild(l);}catch(e){}})();`,
-          }}
-        />
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+        <link rel="icon" type="image/png" href="/logo-spheres.png" />
+        <link rel="apple-touch-icon" href="/logo-spheres.png" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"

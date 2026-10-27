@@ -819,6 +819,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 </span>
                 <Link
                   href={getStudioHref(tool.studioHref)}
+                  prefetch={false}
                   className="inline-flex items-center gap-1 text-xs font-bold text-[#0066ff] group-hover:translate-x-0.5 transition"
                 >
                   <span>Use Tool</span>

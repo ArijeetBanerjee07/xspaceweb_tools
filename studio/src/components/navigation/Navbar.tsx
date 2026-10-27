@@ -351,6 +351,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                         <Link
                           key={tool.slug}
                           href={href}
+                          prefetch={false}
                           onClick={() => setActiveMenu(null)}
                           className="group flex items-center justify-between py-1.5 px-2 rounded-lg hover:bg-blue-50/80 transition-colors"
                         >
@@ -407,6 +408,7 @@ export function Navbar({ isAuthenticated = false }: NavbarProps) {
                     <Link
                       key={tool.slug}
                       href={href}
+                      prefetch={false}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="text-xs text-slate-700 hover:text-blue-600 hover:bg-blue-50 py-1.5 px-2 rounded-md truncate font-medium flex items-center justify-between gap-1"
                     >
