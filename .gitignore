@@ -23,3 +23,14 @@ build/
 Thumbs.db
 *.log
 .vercel
+
+# Local PDF extraction and page-preview artifacts
+/extracted_pdf_images/
+/pdf_slices/
+/pdf_page_1.png
+/_about_*.png
+/_zone_*.png
+/test_footer_banner.jpg
+/inspect_pdf.py
+/studio/_shot_about*.cjs
+/studio/shot2.cjs
