@@ -13,6 +13,7 @@ import {
   LuFileSpreadsheet,
   LuMinimize2,
   LuTrendingUp,
+  LuChartColumn,
   LuArrowRight,
   LuSearch,
   LuCheck,
@@ -38,19 +39,26 @@ import {
   LuDownload,
   LuLink,
   LuFileCheck,
+  LuFiles,
+  LuGitCompare,
+  LuLanguages,
+  LuLockOpen,
   LuMaximize2,
+  LuMessageSquareText,
+  LuReceipt,
+  LuScanText,
+  LuStamp,
   LuGlobe,
   LuImage,
+  LuBox,
+  LuX,
+  LuPenLine,
 } from "react-icons/lu";
 import {
-  FaXTwitter,
-  FaLinkedinIn,
-  FaYoutube,
-  FaInstagram,
-  FaFacebookF,
   FaFilePdf,
 } from "react-icons/fa6";
 import { Navbar } from "@/components/navigation/Navbar";
+import { SiteFooter } from "@/components/site/SiteFooter";
 
 // Studios Data matching the PDF specifications
 const STUDIOS_DATA = [
@@ -103,7 +111,7 @@ const STUDIOS_DATA = [
     desc: "Remove photo backgrounds automatically in 2 seconds. Replace with clean studio backgrounds and solid colors.",
     href: "/app/studios/background",
     previewImage: "/studios/background.webp",
-    icon: LuScissors,
+    icon: LuImage,
     badge: "Neural Matting",
     badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
     colorHex: "#10b981",
@@ -169,7 +177,7 @@ const STUDIOS_DATA = [
     icon: LuShieldCheck,
     badge: "AES-256 Safe",
     badgeColor: "bg-emerald-50 text-emerald-600 border-emerald-200",
-    colorHex: "#059669",
+    colorHex: "#10b981",
     inputFormats: "PDF",
     outputFormats: "Encrypted PDF, Signed PDF with Audit Log",
     featuredOps: [
@@ -187,10 +195,10 @@ const STUDIOS_DATA = [
     desc: "Reduce PDF and image file sizes without losing quality and enhance with AI-powered tools.",
     href: "/app/studios/compress",
     previewImage: "/studios/compress.webp",
-    icon: LuMinimize2,
+    icon: LuSparkles,
     badge: "Up to -85%",
     badgeColor: "bg-amber-50 text-amber-600 border-amber-200",
-    colorHex: "#d97706",
+    colorHex: "#8b5cf6",
     inputFormats: "PDF, PNG, JPG, WEBP",
     outputFormats: "Optimized PDF, WebP, Compressed PNG/JPG",
     featuredOps: [
@@ -229,10 +237,10 @@ const STUDIOS_DATA = [
     desc: "Explore search queries, keyword gaps and monitor topic momentum with AI.",
     href: "/app/studios/trendrank",
     previewImage: "/studios/trendrank.webp",
-    icon: LuTrendingUp,
+    icon: LuChartColumn,
     badge: "SEO Insights",
     badgeColor: "bg-purple-50 text-purple-600 border-purple-200",
-    colorHex: "#9333ea",
+    colorHex: "#f97316",
     inputFormats: "Keywords, domain queries, search prompts",
     outputFormats: "Exportable CSV, Strategic Keyword Tables",
     featuredOps: [
@@ -245,37 +253,67 @@ const STUDIOS_DATA = [
   },
 ];
 
+// Rotating accent colors for featured operation icons, matching the design
+const OP_ACCENTS = ["text-blue-600", "text-violet-600", "text-emerald-600", "text-amber-500", "text-rose-500"];
+
+// Per-tool tile color and glyph for the All Tools Directory cards
+interface ToolTile {
+  bg: string;
+  icon?: typeof LuFileText;
+  glyph?: string;
+}
+
+const DEFAULT_TOOL_TILE: ToolTile = { bg: "#0066ff", icon: LuFileText };
+
+const TOOL_TILES: Record<string, ToolTile> = {
+  "merge-pdf": { bg: "#e11d48", icon: LuFiles },
+  "split-pdf": { bg: "#f97316", icon: LuScissors },
+  "compress-pdf": { bg: "#16a34a", icon: LuMinimize2 },
+  "pdf-to-word": { bg: "#2563eb", glyph: "W" },
+  "word-to-pdf": { bg: "#dc2626", icon: FaFilePdf },
+  "pdf-to-excel": { bg: "#12805c", glyph: "X" },
+  "protect-pdf": { bg: "#7c3aed", icon: LuLock },
+  "unlock-pdf": { bg: "#0d9488", icon: LuLockOpen },
+  "watermark-pdf": { bg: "#8b5cf6", icon: LuStamp },
+  "ocr-pdf": { bg: "#0891b2", icon: LuScanText },
+  "chat-pdf": { bg: "#8b5cf6", icon: LuMessageSquareText },
+  "summarize-pdf": { bg: "#a855f7", icon: LuSparkles },
+  "compare-docs": { bg: "#6366f1", icon: LuGitCompare },
+  "invoice-extract": { bg: "#0d9488", icon: LuReceipt },
+  "doc-translate": { bg: "#ec4899", icon: LuLanguages },
+};
+
 // 5 Persona groups from the design
 const PERSONAS_DATA = [
   {
     name: "Individuals",
     desc: "Personal productivity",
     icon: LuUser,
-    bg: "bg-blue-50/70 border-blue-100/80 text-blue-600",
+    bg: "bg-[#eff6ff] border-blue-100/90 text-[#0066ff]",
   },
   {
     name: "Students",
     desc: "Learn and create",
     icon: LuGraduationCap,
-    bg: "bg-emerald-50/70 border-emerald-100/80 text-emerald-600",
+    bg: "bg-[#ecfdf5] border-emerald-100/90 text-emerald-600",
   },
   {
     name: "Creators",
     desc: "Design and content",
     icon: LuPalette,
-    bg: "bg-amber-50/70 border-amber-100/80 text-amber-600",
+    bg: "bg-[#fffbeb] border-amber-100/90 text-amber-600",
   },
   {
     name: "Teams",
     desc: "Collaborate and share",
     icon: LuUsers,
-    bg: "bg-purple-50/70 border-purple-100/80 text-purple-600",
+    bg: "bg-[#f5f3ff] border-purple-100/90 text-purple-600",
   },
   {
     name: "Businesses",
     desc: "Scale your workflow",
     icon: LuBuilding2,
-    bg: "bg-sky-50/70 border-sky-100/80 text-sky-600",
+    bg: "bg-[#f0f9ff] border-sky-100/90 text-sky-600",
   },
 ];
 
@@ -287,8 +325,8 @@ const LATEST_TOOLS_DATA = [
     desc: "Chat with your documents and get instant answers.",
     href: "/app/studios/ai-document",
     badge: "AI",
-    badgeBg: "bg-purple-600 text-white",
-    cardBg: "bg-purple-50/50",
+    badgeBg: "bg-[#9333ea] text-white",
+    illustration: "/banners/tool_ill_ai_doc.png",
   },
   {
     id: "bg-remover",
@@ -296,8 +334,9 @@ const LATEST_TOOLS_DATA = [
     desc: "Remove and replace backgrounds with AI.",
     href: "/app/studios/background",
     badge: "Image",
-    badgeBg: "bg-emerald-600 text-white",
-    cardBg: "bg-emerald-50/50",
+    badgeIcon: LuImage,
+    badgeBg: "bg-[#10b981] text-white",
+    illustration: "/banners/tool_ill_bg_remove.png",
   },
   {
     id: "secure-pdf",
@@ -305,8 +344,9 @@ const LATEST_TOOLS_DATA = [
     desc: "Protect, encrypt and lock your PDF files.",
     href: "/app/studios/security",
     badge: "Security",
-    badgeBg: "bg-blue-600 text-white",
-    cardBg: "bg-blue-50/50",
+    badgeIcon: LuLock,
+    badgeBg: "bg-[#3b82f6] text-white",
+    illustration: "/banners/tool_ill_secure_pdf.png",
   },
   {
     id: "qr-analytics",
@@ -314,8 +354,9 @@ const LATEST_TOOLS_DATA = [
     desc: "Create QR codes and track engagement.",
     href: "/app/studios/qr-link",
     badge: "QR",
-    badgeBg: "bg-rose-500 text-white",
-    cardBg: "bg-rose-50/50",
+    badgeIcon: LuQrCode,
+    badgeBg: "bg-[#f43f5e] text-white",
+    illustration: "/banners/tool_ill_qr_code.png",
   },
 ];
 
@@ -359,6 +400,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
   const [expandedFaq, setExpandedFaq] = useState<string | null>("q1");
   const [isLoggedIn, setIsLoggedIn] = useState(isAuthenticated);
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
 
   // Sync session client-side
   useEffect(() => {
@@ -396,6 +438,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
   const activeStudio = useMemo(() => {
     return STUDIOS_DATA.find((s) => s.id === activeStudioId) || STUDIOS_DATA[7];
   }, [activeStudioId]);
+  const ActiveStudioIcon = activeStudio.icon;
 
   const categories = useMemo(() => {
     return [
@@ -419,7 +462,8 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
       const matchesCategory =
         selectedCategory === "All" ||
         tool.category.toLowerCase().includes(selectedCategory.toLowerCase()) ||
-        tool.studioName.toLowerCase().includes(selectedCategory.toLowerCase());
+        tool.studioName.toLowerCase().includes(selectedCategory.toLowerCase()) ||
+        (selectedCategory === "AI Tools" && tool.studioId === "ai-document");
       const matchesQuery =
         !q ||
         tool.name.toLowerCase().includes(q) ||
@@ -545,8 +589,8 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
           </p>
         </div>
 
-        {/* 9 Studio Tabs - Wrapped & Centered to never cut off */}
-        <div role="tablist" aria-label="Production Studios" className="flex flex-wrap items-center justify-center gap-2 sm:gap-2.5 max-w-5xl mx-auto pb-4">
+        {/* 9 Studio Tabs - colored icon chips */}
+        <div role="tablist" aria-label="Production Studios" className="flex flex-wrap items-center justify-center gap-2 max-w-6xl mx-auto pb-4">
           {STUDIOS_DATA.map((s) => {
             const Icon = s.icon;
             const isActive = s.id === activeStudioId;
@@ -556,16 +600,25 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 role="tab"
                 aria-selected={isActive}
                 onClick={() => setActiveStudioId(s.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition border ${
+                className={`flex items-center gap-2 pl-1.5 pr-3.5 py-1.5 rounded-xl border text-xs font-semibold whitespace-nowrap transition ${
                   isActive
-                    ? "bg-[#0066ff] text-white border-[#0066ff] shadow-md font-bold"
-                    : "bg-white text-slate-700 border-slate-200/90 hover:bg-slate-50 shadow-2xs"
+                    ? "bg-[#0066ff] text-white border-[#0066ff] shadow-[0_8px_18px_-8px_rgba(0,102,255,0.7)]"
+                    : "bg-white text-slate-800 border-slate-200 hover:border-slate-300 hover:bg-slate-50 shadow-2xs"
                 }`}
               >
-                <Icon
-                  className={`w-4 h-4 ${isActive ? "text-white" : ""}`}
-                  style={{ color: isActive ? "#ffffff" : s.colorHex }}
-                />
+                <span
+                  aria-hidden="true"
+                  className={`w-6 h-6 rounded-lg flex items-center justify-center shrink-0 text-white ${
+                    isActive ? "bg-white/20" : ""
+                  }`}
+                  style={isActive ? undefined : { backgroundColor: s.colorHex }}
+                >
+                  {s.id === "ai-document" ? (
+                    <span className="text-[10px] font-extrabold tracking-tight">AI</span>
+                  ) : (
+                    <Icon className="w-3.5 h-3.5" strokeWidth={2.4} />
+                  )}
+                </span>
                 <span>{s.name}</span>
               </button>
             );
@@ -573,69 +626,77 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
         </div>
 
         {/* Active Studio Detail Container */}
-        <div className="mt-6 rounded-3xl border border-slate-200/90 bg-white shadow-xl overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 items-stretch">
-            {/* Left Column: Details, Capabilities, and Operations */}
-            <div className="lg:col-span-6 p-6 sm:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-100">
-              <div className="space-y-5">
-                <div className="flex items-center gap-2.5">
-                  <span className={`px-2.5 py-1 rounded-md text-xs font-mono font-bold border ${activeStudio.badgeColor}`}>
-                    {activeStudio.badge}
-                  </span>
-                  <span className="text-xs text-slate-500 font-mono">
-                    Workspace Route: {activeStudio.href}
-                  </span>
+        <div className="mt-6 rounded-[28px] border border-slate-200/80 bg-white shadow-[0_30px_80px_-40px_rgba(15,23,42,0.35)] p-4 sm:p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-stretch">
+            {/* Left Column: Studio Visual */}
+            <div className="lg:col-span-5 relative overflow-hidden rounded-3xl bg-slate-100 aspect-[4/3] sm:aspect-[16/10] lg:aspect-auto lg:min-h-[500px] group">
+              <img
+                key={activeStudio.id}
+                src={activeStudio.previewImage}
+                alt={`${activeStudio.name} Interface Preview`}
+                width={640}
+                height={800}
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
+              />
+            </div>
+
+            {/* Right Column: Details, Capabilities, and Operations */}
+            <div className="lg:col-span-7 flex flex-col justify-center lg:py-2 lg:pr-2">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-bold border ${activeStudio.badgeColor}`}>
+                  <ActiveStudioIcon className="w-3 h-3" strokeWidth={2.6} />
+                  {activeStudio.badge}
+                </span>
+                <span className="text-xs text-slate-400">
+                  Workspace Route: <span className="font-mono text-slate-600">{activeStudio.href}</span>
+                </span>
+              </div>
+
+              <h3 className="mt-4 text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                {activeStudio.name}
+              </h3>
+              <p className="mt-1.5 text-sm sm:text-base font-semibold text-[#0066ff]">
+                {activeStudio.tagline}
+              </p>
+              <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+                {activeStudio.desc}
+              </p>
+
+              {/* Specs Box */}
+              <div className="mt-5 rounded-xl border border-slate-200 px-4 py-3 text-xs">
+                <div className="grid grid-cols-[104px_1fr] gap-x-3 gap-y-2">
+                  <span className="text-slate-500">Input Formats:</span>
+                  <span className="font-medium text-slate-700">{activeStudio.inputFormats}</span>
+                  <span className="text-slate-500">Output Formats:</span>
+                  <span className="font-medium text-slate-700">{activeStudio.outputFormats}</span>
                 </div>
+              </div>
 
-                <div>
-                  <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                    {activeStudio.name}
-                  </h3>
-                  <p className="text-sm sm:text-base font-semibold text-[#0066ff] mt-1">
-                    {activeStudio.tagline}
-                  </p>
+              {/* Featured Operations in Studio */}
+              <div className="mt-5">
+                <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-400">
+                  Featured Operations in Studio
                 </div>
-
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  {activeStudio.desc}
-                </p>
-
-                {/* Specs Box */}
-                <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 text-xs space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">Input Formats:</span>
-                    <span className="font-semibold text-slate-800">{activeStudio.inputFormats}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-slate-500 font-medium">Output Formats:</span>
-                    <span className="font-semibold text-slate-800">{activeStudio.outputFormats}</span>
-                  </div>
-                </div>
-
-                {/* Featured Operations in Studio */}
-                <div className="pt-2 space-y-2">
-                  <div className="text-xs font-mono uppercase tracking-wider text-slate-400 font-bold">
-                    FEATURED OPERATIONS IN STUDIO
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                    {activeStudio.featuredOps.map((op) => {
-                      const OpIcon = op.icon;
-                      return (
-                        <div
-                          key={op.name}
-                          className="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 bg-white border border-slate-200 px-3 py-2 rounded-xl shadow-2xs"
-                        >
-                          <OpIcon className="w-3.5 h-3.5 text-[#0066ff] shrink-0" />
-                          <span className="truncate">{op.name}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
+                <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {activeStudio.featuredOps.map((op, index) => {
+                    const OpIcon = op.icon;
+                    return (
+                      <div
+                        key={op.name}
+                        className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700"
+                      >
+                        <OpIcon className={`w-4 h-4 shrink-0 ${OP_ACCENTS[index % OP_ACCENTS.length]}`} />
+                        <span className="truncate">{op.name}</span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="pt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5">
+              <div className="mt-6 flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                 <Link
                   href={getStudioHref(activeStudio.href)}
                   className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-[#0066ff] hover:bg-blue-700 text-white font-bold text-sm shadow-md transition text-center"
@@ -652,66 +713,6 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 </Link>
               </div>
             </div>
-
-            {/* Right Column: Visual Mockup Showcase matching the PDF */}
-            <div className="lg:col-span-6 bg-gradient-to-br from-blue-50/50 via-slate-50 to-indigo-50/40 p-5 sm:p-8 flex flex-col justify-between">
-              <div className="relative w-full rounded-2xl border border-slate-200/90 overflow-hidden shadow-xl bg-white flex flex-col group">
-                {/* Mac/Browser style title bar */}
-                <div className="w-full bg-slate-100/90 border-b border-slate-200 px-4 py-2.5 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-2.5 h-2.5 rounded-full bg-red-400 border border-red-500/40" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400 border border-amber-500/40" />
-                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 border border-emerald-500/40" />
-                    <span className="text-xs font-semibold text-slate-600 ml-2 font-mono truncate max-w-[180px] sm:max-w-none">
-                      {activeStudio.name} — Studio Engine
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-bold font-mono">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Live Studio
-                  </div>
-                </div>
-
-                {/* Studio Interactive Graphic / Screenshot */}
-                <div className="relative w-full aspect-[4/3] bg-slate-50 overflow-hidden flex items-center justify-center">
-                  <img
-                    key={activeStudio.id}
-                    src={activeStudio.previewImage}
-                    alt={`${activeStudio.name} Interface Preview`}
-                    width={600}
-                    height={450}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                  />
-                  {/* Floating Pill Overlay */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between px-3.5 py-2 rounded-xl bg-white/95 backdrop-blur-md border border-slate-200/80 shadow-md text-xs">
-                    <span className="font-semibold text-slate-800 truncate mr-2">
-                      {activeStudio.tagline}
-                    </span>
-                    <span className="font-mono text-[#0066ff] font-bold shrink-0 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-                      Vector / 300 DPI
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Hardware stats */}
-              <div className="mt-4 flex flex-wrap items-center justify-between w-full text-xs text-slate-500 font-mono gap-2 pt-2">
-                <span className="flex items-center gap-1">
-                  <LuZap className="w-3.5 h-3.5 text-blue-600" />
-                  Hardware Accelerated
-                </span>
-                <span className="flex items-center gap-1">
-                  <LuLock className="w-3.5 h-3.5 text-emerald-600" />
-                  Zero Telemetry
-                </span>
-                <span className="flex items-center gap-1">
-                  <LuCpu className="w-3.5 h-3.5 text-purple-600" />
-                  Sub-150ms Processing
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -719,8 +720,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
       {/* ================= SECTION 3: ALL TOOLS DIRECTORY ================= */}
       <section id="tools" className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-xs font-bold text-[#0066ff] mb-3">
-            <LuSearch className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center px-3.5 py-1 rounded-full bg-blue-50 text-xs font-bold text-[#0066ff] mb-3">
             <span>40+ Powerful Online Tools</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
@@ -746,7 +746,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
               aria-label="Search all online tools"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-11 pr-20 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0066ff] focus:ring-2 focus:ring-[#0066ff]/20 shadow-sm transition"
+              className="w-full pl-11 pr-20 py-3.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0066ff] focus:ring-2 focus:ring-[#0066ff]/20 shadow-sm transition"
             />
             <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2">
               {searchQuery ? (
@@ -767,78 +767,103 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
         </div>
 
         {/* Category Filter Pills with Horizontal Scroll */}
-        <div role="group" aria-label="Tool categories" className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-none justify-start lg:justify-center max-w-5xl mx-auto mb-10">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              aria-pressed={selectedCategory === cat}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition border cursor-pointer ${
-                selectedCategory === cat
-                  ? "bg-[#0066ff] text-white border-[#0066ff] shadow-sm font-bold"
-                  : "bg-white text-slate-600 hover:text-slate-900 border-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="flex items-center gap-3 max-w-6xl mx-auto mb-10">
+          <div
+            ref={categoryScrollRef}
+            role="group"
+            aria-label="Tool categories"
+            className="flex flex-1 items-center gap-2 overflow-x-auto scrollbar-none pb-1 justify-start lg:justify-center"
+          >
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                aria-pressed={selectedCategory === cat}
+                className={`px-4 py-1.5 rounded-lg text-[13px] font-semibold whitespace-nowrap transition border cursor-pointer ${
+                  selectedCategory === cat
+                    ? "bg-[#0066ff] text-white border-[#0066ff]"
+                    : "bg-white text-slate-700 border-slate-200 shadow-2xs hover:border-slate-300 hover:bg-slate-50"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => categoryScrollRef.current?.scrollBy({ left: 220, behavior: "smooth" })}
+            aria-label="Scroll categories right"
+            className="w-9 h-9 shrink-0 rounded-full bg-white border border-slate-200 shadow-sm flex items-center justify-center text-slate-500 hover:text-slate-900 hover:border-slate-300 transition cursor-pointer"
+          >
+            <LuChevronRight className="w-4 h-4" />
+          </button>
         </div>
 
         {/* 3-Column Tool Cards Grid matching the PDF */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredTools.slice(0, 18).map((tool) => (
-            <div
-              key={tool.id}
-              className="p-6 rounded-2xl bg-white border border-slate-200/90 hover:border-blue-400 hover:shadow-lg transition-all flex flex-col justify-between group"
-            >
-              <div>
-                {/* Header row: Icon, Studio Badge, Tier Badge */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-[#0066ff] flex items-center justify-center font-bold">
-                      <LuFileText className="w-5 h-5" />
+          {filteredTools.slice(0, 18).map((tool) => {
+            const tile = TOOL_TILES[tool.id] ?? DEFAULT_TOOL_TILE;
+            const TileIcon = tile.icon;
+            return (
+              <div
+                key={tool.id}
+                className="p-5 rounded-xl bg-white border border-slate-200/80 shadow-sm hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group"
+              >
+                <div>
+                  {/* Header row: Icon, Studio Badge, Tier Badge */}
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2.5">
+                      <div
+                        className="w-9 h-9 rounded-lg flex items-center justify-center text-white shrink-0"
+                        style={{ backgroundColor: tile.bg }}
+                      >
+                        {tile.glyph ? (
+                          <span className="text-base font-extrabold leading-none">{tile.glyph}</span>
+                        ) : TileIcon ? (
+                          <TileIcon className="w-5 h-5" strokeWidth={2.2} />
+                        ) : null}
+                      </div>
+                      <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-md bg-[#eef1fa] text-slate-600">
+                        {tool.studioName}
+                      </span>
                     </div>
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">
-                      {tool.studioName}
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
+                        tool.tier === "Free"
+                          ? "bg-emerald-50 text-emerald-600"
+                          : tool.tier === "Starter"
+                          ? "bg-blue-50 text-blue-600"
+                          : "bg-purple-50 text-purple-600"
+                      }`}
+                    >
+                      {tool.tier}
                     </span>
                   </div>
-                  <span
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                      tool.tier === "Free"
-                        ? "bg-emerald-50 text-emerald-600 border-emerald-200"
-                        : tool.tier === "Starter"
-                        ? "bg-blue-50 text-blue-600 border-blue-200"
-                        : "bg-purple-50 text-purple-600 border-purple-200"
-                    }`}
-                  >
-                    {tool.tier}
-                  </span>
+
+                  <h4 className="text-base font-bold text-slate-900 group-hover:text-[#0066ff] transition">
+                    {tool.name}
+                  </h4>
+                  <p className="text-[13px] text-slate-500 mt-1.5 line-clamp-2 leading-relaxed">
+                    {tool.description}
+                  </p>
                 </div>
 
-                <h4 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#0066ff] transition">
-                  {tool.name}
-                </h4>
-                <p className="text-xs text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
-                  {tool.description}
-                </p>
+                {/* Bottom row: Format & Use Tool */}
+                <div className="mt-4 flex items-center justify-between">
+                  <span className="text-xs text-slate-500">
+                    Format: {tool.inputFormat.split(",")[0] || ".pdf"}
+                  </span>
+                  <Link
+                    href={getStudioHref(tool.studioHref)}
+                    prefetch={false}
+                    className="inline-flex items-center gap-1 text-xs font-bold text-[#0066ff] group-hover:translate-x-0.5 transition"
+                  >
+                    <span>Use Tool</span>
+                    <LuArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
-
-              {/* Bottom row: Format & Use Tool */}
-              <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
-                <span className="text-[11px] text-slate-500 font-mono">
-                  Format: {tool.inputFormat.split(",")[0] || ".pdf"}
-                </span>
-                <Link
-                  href={getStudioHref(tool.studioHref)}
-                  prefetch={false}
-                  className="inline-flex items-center gap-1 text-xs font-bold text-[#0066ff] group-hover:translate-x-0.5 transition"
-                >
-                  <span>Use Tool</span>
-                  <LuArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* View All Tools CTA Button */}
@@ -1135,14 +1160,14 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
       {/* ================= SECTION 5: WHY CONSOLIDATE ON XSW TOOLS? ================= */}
       <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-xs font-bold text-[#0066ff] mb-3">
-            <LuTrendingUp className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-xs font-bold text-[#0066ff] mb-3">
+            <LuChartColumn className="w-3.5 h-3.5" />
             <span>SMARTER CHOICE</span>
           </div>
           <h2 className="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
             Why Consolidate on <span className="text-[#0066ff]">XSW Tools?</span>
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-slate-600">
+          <p className="mt-3 text-sm sm:text-base text-slate-500">
             Compare the fragmented cost of buying isolated SaaS apps against our unified studio.
           </p>
         </div>
@@ -1150,160 +1175,162 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
         {/* Side-by-side comparison container with center VS circle */}
         <div className="relative max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
           {/* Left Card: Fragmented Subscriptions */}
-          <div className="p-7 sm:p-9 rounded-3xl bg-white border border-rose-200 shadow-sm flex flex-col justify-between">
-            <div className="space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-rose-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold">
+          <div className="p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-[0_4px_24px_rgba(0,0,0,0.03)] flex flex-col justify-between">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-3 mb-5">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-100 to-rose-50 border border-rose-200/60 text-rose-500 flex items-center justify-center font-bold shadow-xs shrink-0">
                     <LuLayers className="w-5 h-5" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-extrabold text-slate-900">Fragmented Subscriptions</h3>
-                    <p className="text-xs text-slate-500">Multiple tools, multiple logins, higher cost.</p>
+                  <div className="min-w-0">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">Fragmented Subscriptions</h3>
+                    <p className="text-xs text-slate-500 mt-1 leading-snug">Multiple tools, multiple logins, higher cost.</p>
                   </div>
                 </div>
-                <span className="px-3 py-1 rounded-full bg-rose-50 text-rose-600 text-xs font-extrabold border border-rose-200">
-                  ~$90 / month <span className="font-normal text-[10px]">(Estimated)</span>
-                </span>
+                <div className="px-3.5 py-2 rounded-2xl bg-[#fff1f2] border border-rose-200/60 text-right shrink-0 shadow-2xs">
+                  <div className="text-sm sm:text-base font-extrabold text-[#e11d48] whitespace-nowrap leading-tight">~$90 / month</div>
+                  <div className="text-[11px] text-slate-400 font-normal leading-tight mt-0.5 whitespace-nowrap text-center sm:text-right">(Estimated)</div>
+                </div>
               </div>
 
               {/* List of Apps */}
               <div className="space-y-3 text-xs sm:text-sm text-slate-700">
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-md bg-red-600 text-white text-[11px] font-bold flex items-center justify-center">
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#e11d48] text-white flex items-center justify-center font-black text-sm shrink-0 shadow-xs">
                       A
-                    </span>
+                    </div>
                     <div>
-                      <span className="font-semibold text-slate-900">Adobe Acrobat Pro</span>
-                      <p className="text-[10px] text-slate-500">PDF operations</p>
+                      <span className="font-bold text-slate-900">Adobe Acrobat Pro</span>
+                      <p className="text-[11px] text-slate-500">PDF operations</p>
                     </div>
                   </div>
-                  <span className="font-mono font-semibold text-slate-600">$23.99 / mo</span>
+                  <span className="font-semibold text-slate-600 text-xs sm:text-sm">$23.99 / mo</span>
                 </div>
 
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-md bg-slate-800 text-white text-[11px] font-bold flex items-center justify-center">
-                      R
-                    </span>
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-slate-100 border border-slate-200 overflow-hidden relative flex items-center justify-center shrink-0 shadow-xs" style={{ backgroundImage: "linear-gradient(45deg, #cbd5e1 25%, transparent 25%), linear-gradient(-45deg, #cbd5e1 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #cbd5e1 75%), linear-gradient(-45deg, transparent 75%, #cbd5e1 75%)", backgroundSize: "6px 6px", backgroundPosition: "0 0, 0 3px, 3px -3px, -3px 0px" }}>
+                      <LuImage className="w-4 h-4 text-slate-700" />
+                    </div>
                     <div>
-                      <span className="font-semibold text-slate-900">Remove.bg</span>
-                      <p className="text-[10px] text-slate-500">Background cutouts</p>
+                      <span className="font-bold text-slate-900">Remove.bg</span>
+                      <p className="text-[11px] text-slate-500">Background cutouts</p>
                     </div>
                   </div>
-                  <span className="font-mono font-semibold text-slate-600">$9.00 / mo</span>
+                  <span className="font-semibold text-slate-600 text-xs sm:text-sm">$9.00 / mo</span>
                 </div>
 
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-md bg-emerald-600 text-white text-[11px] font-bold flex items-center justify-center">
-                      C
-                    </span>
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#10a37f] text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <LuSparkles className="w-4 h-4" />
+                    </div>
                     <div>
-                      <span className="font-semibold text-slate-900">ChatPDF / AI Reader</span>
-                      <p className="text-[10px] text-slate-500">Document analysis</p>
+                      <span className="font-bold text-slate-900">ChatPDF / AI Reader</span>
+                      <p className="text-[11px] text-slate-500">Document analysis</p>
                     </div>
                   </div>
-                  <span className="font-mono font-semibold text-slate-600">$15.00 / mo</span>
+                  <span className="font-semibold text-slate-600 text-xs sm:text-sm">$15.00 / mo</span>
                 </div>
 
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-md bg-purple-600 text-white text-[11px] font-bold flex items-center justify-center">
-                      D
-                    </span>
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#7c3aed] text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <LuPenLine className="w-4 h-4" />
+                    </div>
                     <div>
-                      <span className="font-semibold text-slate-900">DocuSign</span>
-                      <p className="text-[10px] text-slate-500">Digital signatures</p>
+                      <span className="font-bold text-slate-900">DocuSign</span>
+                      <p className="text-[11px] text-slate-500">Digital signatures</p>
                     </div>
                   </div>
-                  <span className="font-mono font-semibold text-slate-600">$10.00 / mo</span>
+                  <span className="font-semibold text-slate-600 text-xs sm:text-sm">$10.00 / mo</span>
                 </div>
 
-                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-6 h-6 rounded-md bg-orange-600 text-white text-[11px] font-bold flex items-center justify-center">
-                      S
-                    </span>
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-xl bg-[#ff5a00] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                      St
+                    </div>
                     <div>
-                      <span className="font-semibold text-slate-900">Ahrefs / Semrush Lite</span>
-                      <p className="text-[10px] text-slate-500">Keyword search data</p>
+                      <span className="font-bold text-slate-900">Ahrefs / Semrush Lite</span>
+                      <p className="text-[11px] text-slate-500">Keyword search data</p>
                     </div>
                   </div>
-                  <span className="font-mono font-semibold text-slate-600">$29.00 / mo</span>
+                  <span className="font-semibold text-slate-600 text-xs sm:text-sm">$29.00 / mo</span>
                 </div>
               </div>
             </div>
 
             {/* Red Callout Box at Bottom */}
-            <div className="mt-6 p-4 rounded-2xl bg-rose-50 border border-rose-200/80 flex items-center gap-3 text-rose-700">
-              <div className="w-7 h-7 rounded-full bg-rose-600 text-white flex items-center justify-center font-bold text-xs shrink-0">
-                &times;
+            <div className="mt-6 p-4 rounded-2xl bg-[#fff1f2] border border-rose-200/70 flex items-center gap-3 text-rose-700">
+              <div className="w-7 h-7 rounded-full bg-rose-500 text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                <LuX className="w-4 h-4 stroke-[3]" />
               </div>
               <div className="text-xs">
-                <span className="font-extrabold text-sm block">Total: ~$90 / month</span>
-                <span className="text-rose-600/90">Fragmented tools, separate logins, higher overhead.</span>
+                <span className="font-extrabold text-sm text-rose-600 block">Total: ~$90 / month</span>
+                <span className="text-slate-500 mt-0.5 block">Fragmented tools, separate logins, higher overhead.</span>
               </div>
             </div>
           </div>
 
           {/* Center VS Badge */}
-          <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border-2 border-slate-200 shadow-md items-center justify-center text-xs font-black text-slate-700 z-20">
+          <div className="hidden md:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border border-slate-200 shadow-md items-center justify-center text-xs font-black text-[#0066ff] z-20">
             VS
           </div>
 
           {/* Right Card: XSW Tools */}
-          <div className="p-7 sm:p-9 rounded-3xl bg-white border-2 border-[#0066ff] shadow-xl flex flex-col justify-between relative overflow-hidden">
-            <div className="space-y-5">
-              <div className="flex items-center justify-between pb-3 border-b border-blue-100">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#0066ff] text-white flex items-center justify-center font-bold">
-                    <img src="/logo.webp" alt="XSW Tools" width={24} height={24} loading="lazy" className="w-6 h-6 object-contain" />
+          <div className="p-6 sm:p-8 rounded-3xl bg-white border border-blue-200/90 shadow-[0_4px_30px_rgba(0,102,255,0.06)] flex flex-col justify-between relative overflow-hidden">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between gap-3 mb-5">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-11 h-11 rounded-2xl bg-[#0066ff] text-white flex items-center justify-center font-bold shadow-sm shadow-blue-500/25 shrink-0">
+                    <LuBox className="w-5 h-5 stroke-[2.2]" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-extrabold text-slate-900">XSW Tools</h3>
-                    <p className="text-xs text-[#0066ff] font-medium">All 9 Studios, One Powerful Platform.</p>
+                  <div className="min-w-0">
+                    <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-tight">XSW Tools</h3>
+                    <p className="text-xs text-[#0066ff] font-medium mt-1 leading-snug">All 9 Studios, One Powerful Platform.</p>
                   </div>
                 </div>
-                <span className="px-3.5 py-1 rounded-full bg-blue-50 text-[#0066ff] text-xs font-extrabold border border-blue-200">
-                  ₹299 / month <span className="font-normal text-[10px]">(~$3.5)</span>
-                </span>
+                <div className="px-4 py-2 rounded-2xl bg-[#e0edff] border border-blue-200/70 text-center shrink-0 shadow-2xs">
+                  <div className="text-sm sm:text-base font-extrabold text-[#0066ff] whitespace-nowrap leading-tight">₹299 / month</div>
+                  <div className="text-[11px] text-[#0066ff]/80 font-medium leading-tight mt-0.5 whitespace-nowrap">(~$3.5)</div>
+                </div>
               </div>
 
               {/* Benefits with Checked Circles */}
-              <div className="space-y-3.5 text-xs sm:text-sm text-slate-800 font-medium">
-                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/50">
-                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0">
-                    <LuCheck className="w-3 h-3" />
+              <div className="space-y-3.5 text-xs sm:text-sm text-slate-700 font-medium">
+                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/40">
+                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    <LuCheck className="w-3 h-3 stroke-[3]" />
                   </div>
                   <span>All 9 Studios unified under 1 single login</span>
                 </div>
 
-                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/50">
-                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0">
-                    <LuCheck className="w-3 h-3" />
+                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/40">
+                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    <LuCheck className="w-3 h-3 stroke-[3]" />
                   </div>
                   <span>Zero telemetry client-side processing</span>
                 </div>
 
-                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/50">
-                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0">
-                    <LuCheck className="w-3 h-3" />
+                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/40">
+                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    <LuCheck className="w-3 h-3 stroke-[3]" />
                   </div>
                   <span>40+ production tools with unlimited conversions</span>
                 </div>
 
-                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/50">
-                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0">
-                    <LuCheck className="w-3 h-3" />
+                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/40">
+                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    <LuCheck className="w-3 h-3 stroke-[3]" />
                   </div>
                   <span>25 GB cloud storage &amp; priority compute queue</span>
                 </div>
 
-                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/50">
-                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0">
-                    <LuCheck className="w-3 h-3" />
+                <div className="flex items-center gap-3 p-2.5 rounded-xl bg-blue-50/40">
+                  <div className="w-5 h-5 rounded-full bg-[#0066ff] text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    <LuCheck className="w-3 h-3 stroke-[3]" />
                   </div>
                   <span>Save over 90% in monthly software overhead</span>
                 </div>
@@ -1313,7 +1340,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
             <div className="mt-8 pt-4">
               <Link
                 href={isAuthenticated ? "/app" : "/signup"}
-                className="w-full py-4 rounded-xl bg-[#0066ff] hover:bg-blue-700 text-white font-extrabold text-sm shadow-md transition flex items-center justify-center gap-2 active:scale-[0.98]"
+                className="w-full py-4 rounded-xl bg-[#0066ff] hover:bg-blue-700 text-white font-extrabold text-sm shadow-md shadow-blue-500/25 transition flex items-center justify-center gap-2 active:scale-[0.98]"
               >
                 <span>Get Started with XSW Tools</span>
                 <LuArrowRight className="w-4 h-4" />
@@ -1329,26 +1356,26 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
             Made for Every Creator, Team and Business
           </h2>
-          <p className="mt-2 text-sm sm:text-base text-slate-600">
+          <p className="mt-2 text-sm sm:text-base text-slate-500">
             From daily tasks to professional projects — XSPACEWEB Studio helps everyone work smarter.
           </p>
         </div>
 
         {/* 5 Persona Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
           {PERSONAS_DATA.map((p) => {
             const Icon = p.icon;
             return (
               <div
                 key={p.name}
-                className={`p-5 rounded-2xl border ${p.bg} transition-all hover:scale-102 flex flex-col justify-between`}
+                className={`p-3.5 sm:p-4 rounded-2xl border ${p.bg} transition-all hover:scale-102 flex items-center gap-3 shadow-2xs`}
               >
-                <div className="w-9 h-9 rounded-xl bg-white shadow-xs flex items-center justify-center mb-3">
+                <div className="w-10 h-10 rounded-full bg-white shadow-xs flex items-center justify-center shrink-0">
                   <Icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-base font-bold text-slate-900">{p.name}</h4>
-                  <p className="text-xs text-slate-500 mt-0.5">{p.desc}</p>
+                  <h4 className="text-sm font-bold text-slate-900 leading-snug">{p.name}</h4>
+                  <p className="text-xs text-slate-500 mt-0.5 leading-snug">{p.desc}</p>
                 </div>
               </div>
             );
@@ -1363,7 +1390,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
             <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               Latest Tools
             </h3>
-            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+            <p className="text-xs sm:text-sm text-slate-500 mt-1">
               Discover our newest and most powerful tools.
             </p>
           </div>
@@ -1378,29 +1405,44 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
 
         {/* 4 Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {LATEST_TOOLS_DATA.map((tool) => (
-            <div
-              key={tool.id}
-              className={`p-6 rounded-2xl border border-slate-200/90 ${tool.cardBg} bg-white shadow-2xs hover:shadow-md transition flex flex-col justify-between`}
-            >
-              <div>
-                <span className={`inline-block px-2.5 py-0.5 rounded-md text-[11px] font-bold ${tool.badgeBg} mb-3`}>
-                  {tool.badge}
-                </span>
-                <h4 className="text-base font-bold text-slate-900">{tool.name}</h4>
-                <p className="text-xs text-slate-600 mt-1 leading-relaxed">{tool.desc}</p>
-              </div>
+          {LATEST_TOOLS_DATA.map((tool) => {
+            const BadgeIcon = tool.badgeIcon;
+            return (
+              <div
+                key={tool.id}
+                className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group h-[225px]"
+              >
+                <div className="flex items-start justify-between">
+                  <div className={`w-9 h-9 rounded-xl ${tool.badgeBg} flex items-center justify-center font-black text-xs shadow-xs shrink-0`}>
+                    {BadgeIcon ? <BadgeIcon className="w-5 h-5 text-white" /> : tool.badge}
+                  </div>
+                  <img
+                    src={tool.illustration}
+                    alt={tool.name}
+                    className="w-24 h-20 object-contain object-right-top pointer-events-none select-none -mt-1 -mr-1"
+                  />
+                </div>
 
-              <div className="mt-5 text-right">
-                <Link
-                  href={tool.href}
-                  className="w-8 h-8 rounded-full bg-white border border-slate-200 shadow-xs inline-flex items-center justify-center text-slate-600 hover:text-[#0066ff] hover:border-blue-400 transition"
-                >
-                  <LuArrowRight className="w-4 h-4" />
-                </Link>
+                <div className="flex items-end justify-between mt-3">
+                  <div>
+                    <h4 className="text-sm sm:text-base font-bold text-slate-900 group-hover:text-[#0066ff] transition">
+                      {tool.name}
+                    </h4>
+                    <p className="text-xs text-slate-500 mt-1 line-clamp-2 leading-relaxed">
+                      {tool.desc}
+                    </p>
+                  </div>
+
+                  <Link
+                    href={getStudioHref(tool.href)}
+                    className="w-8 h-8 rounded-full border border-blue-200 bg-white text-[#0066ff] flex items-center justify-center shadow-2xs group-hover:bg-[#0066ff] group-hover:text-white transition shrink-0 ml-3"
+                  >
+                    <LuArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -1408,29 +1450,14 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
       <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="rounded-3xl border border-slate-200/90 bg-white shadow-sm p-8 sm:p-12">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-            {/* Left side: Interactive Image Editing Canvas */}
+            {/* Left side: Exact Background Removal Graphic */}
             <div className="lg:col-span-6 flex items-center justify-center">
-              <div className="relative w-full max-w-md aspect-[4/3] rounded-2xl border border-slate-200 bg-slate-50 p-4 overflow-hidden flex items-center justify-center">
-                {/* Simulated bounding box canvas */}
-                <div className="relative w-4/5 h-4/5 rounded-xl border-2 border-dashed border-[#0066ff] bg-gradient-to-tr from-sky-100 to-indigo-100 flex items-center justify-center shadow-md">
-                  <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-[#0066ff] text-white text-[10px] font-bold">
-                    AI
-                  </div>
-                  {/* Selection handles */}
-                  <div className="absolute -top-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-[#0066ff] rounded-xs" />
-                  <div className="absolute -top-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-[#0066ff] rounded-xs" />
-                  <div className="absolute -bottom-1.5 -left-1.5 w-3 h-3 bg-white border-2 border-[#0066ff] rounded-xs" />
-                  <div className="absolute -bottom-1.5 -right-1.5 w-3 h-3 bg-white border-2 border-[#0066ff] rounded-xs" />
-
-                  <img
-                    src="/logo.webp"
-                    alt="Image editor"
-                    width={64}
-                    height={64}
-                    loading="lazy"
-                    className="w-16 h-16 object-contain drop-shadow"
-                  />
-                </div>
+              <div className="relative w-full max-w-md rounded-2xl overflow-hidden flex items-center justify-center">
+                <img
+                  src="/banners/image_editing_preview.png"
+                  alt="Image editing made simple"
+                  className="w-full h-auto object-contain max-h-[380px] drop-shadow-sm select-none"
+                />
               </div>
             </div>
 
@@ -1459,38 +1486,28 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
         </div>
       </section>
 
-      {/* ================= SECTION 9: TRUST BAR ================= */}
-      <section className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
-        <h3 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          The online tools platform trusted by millions
-        </h3>
-        <p className="text-sm text-slate-600 mt-2">
-          Join millions of users who rely on XSPACEWEB Studio to simplify their work.
-        </p>
-
-        {/* 4 Trust Items */}
-        <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-4xl mx-auto">
-          <div className="flex items-center justify-center gap-2.5 text-sm font-bold text-slate-800">
-            <LuShieldCheck className="w-5 h-5 text-slate-600" />
+      {/* ================= SECTION 9 & 10: TRUST BAR & SIMPLE, HONEST PRICING ================= */}
+      <section id="pricing" className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        {/* Top Trust Bar from PDF */}
+        <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-12 text-slate-700 font-bold text-xs sm:text-sm pb-12 mb-6 border-b border-slate-200/60 max-w-4xl mx-auto">
+          <div className="flex items-center gap-2.5">
+            <LuShieldCheck className="w-5 h-5 text-slate-800" />
             <span>100% Secure</span>
           </div>
-          <div className="flex items-center justify-center gap-2.5 text-sm font-bold text-slate-800">
-            <LuZap className="w-5 h-5 text-slate-600" />
+          <div className="flex items-center gap-2.5">
+            <LuZap className="w-5 h-5 text-slate-800" />
             <span>Blazing Fast</span>
           </div>
-          <div className="flex items-center justify-center gap-2.5 text-sm font-bold text-slate-800">
-            <LuLayers className="w-5 h-5 text-slate-600" />
+          <div className="flex items-center gap-2.5">
+            <LuLayers className="w-5 h-5 text-slate-800" />
             <span>40+ Tools</span>
           </div>
-          <div className="flex items-center justify-center gap-2.5 text-sm font-bold text-slate-800">
-            <LuUsers className="w-5 h-5 text-slate-600" />
+          <div className="flex items-center gap-2.5">
+            <LuUsers className="w-5 h-5 text-slate-800" />
             <span>Trusted Worldwide</span>
           </div>
         </div>
-      </section>
 
-      {/* ================= SECTION 10: SIMPLE, HONEST PRICING ================= */}
-      <section id="pricing" className="relative z-10 py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="text-center max-w-3xl mx-auto mb-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-xs font-bold text-amber-800 mb-3">
             <LuCrown className="w-3.5 h-3.5 text-amber-500" />
@@ -1536,135 +1553,140 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
         </div>
 
         {/* 2 Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto items-stretch">
-          {/* Card 1: FREE FOREVER */}
-          <div className="p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between">
-            <div className="space-y-6">
-              <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-slate-500 font-bold">
-                  FREE FOREVER
-                </span>
-                <div className="flex items-baseline gap-1 mt-2">
-                  <span className="text-5xl font-black text-slate-900 tracking-tight">₹0</span>
-                  <span className="text-sm text-slate-500 font-medium">/ month</span>
-                </div>
-                <p className="text-xs text-slate-600 mt-2">
-                  Everything you need to test all 9 studios and execute everyday document workflows without entering a card.
-                </p>
-              </div>
+        <div className="relative max-w-4xl mx-auto">
+          {/* Subtle decorative layered backdrops matching the PDF design */}
+          <div className="hidden md:block absolute -inset-4 bg-gradient-to-r from-blue-100/40 via-sky-50/20 to-blue-100/40 rounded-[2.5rem] -z-10 blur-xs" />
 
-              <div className="pt-4 border-t border-slate-100 space-y-3 text-xs sm:text-sm text-slate-700">
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>Access to all 9 Studio interfaces</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>5 Free AI Document Analysis Credits</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>5 Free Background Matting Credits</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>20 High-Resolution Vector QR Codes</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>1 GB Secure Cloud Storage</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>Max 25 MB file size limit</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-8">
-              <Link
-                href={isAuthenticated ? "/app" : "/signup"}
-                className="w-full py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold rounded-xl text-sm transition flex items-center justify-center gap-2"
-              >
-                <span>Start Free Workspace</span>
-                <LuArrowRight className="w-4 h-4" />
-              </Link>
-              <p className="text-[11px] text-center text-slate-400 mt-2">
-                No credit card required &bull; Instant activation
-              </p>
-            </div>
-          </div>
-
-          {/* Card 2: PRO STUDIO SUITE */}
-          <div className="p-8 rounded-3xl bg-white border-2 border-[#0066ff] shadow-xl flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-4 right-4">
-              <span className="px-3 py-1 rounded-full bg-[#0066ff] text-white text-xs font-black uppercase tracking-wider">
-                RECOMMENDED
-              </span>
-            </div>
-
-            <div className="space-y-6">
-              <div>
-                <span className="text-xs font-mono uppercase tracking-wider text-[#0066ff] font-bold">
-                  PRO STUDIO SUITE
-                </span>
-                <div className="flex items-baseline gap-1 mt-2">
-                  <span className="text-5xl font-black text-slate-900 tracking-tight">
-                    ₹{billingCycle === "yearly" ? 208 : 299}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+            {/* Card 1: FREE FOREVER */}
+            <div className="p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between">
+              <div className="space-y-6">
+                <div>
+                  <span className="text-xs font-mono uppercase tracking-wider text-slate-500 font-bold">
+                    FREE FOREVER
                   </span>
-                  <span className="text-sm text-slate-500 font-medium">/ month</span>
+                  <div className="flex items-baseline gap-1 mt-2">
+                    <span className="text-5xl font-black text-slate-900 tracking-tight">₹0</span>
+                    <span className="text-sm text-slate-500 font-medium">/ month</span>
+                  </div>
+                  <p className="text-xs text-slate-600 mt-2">
+                    Everything you need to test all 9 studios and execute everyday document workflows without entering a card.
+                  </p>
                 </div>
-                <div className="text-xs text-[#0066ff] mt-1 font-mono font-semibold">
-                  {billingCycle === "yearly" ? "Billed annually at ₹2,499 / year" : "Billed monthly at ₹299"}
+
+                <div className="pt-4 border-t border-slate-100 space-y-3 text-xs sm:text-sm text-slate-700">
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>Access to all 9 Studio interfaces</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>5 Free AI Document Analysis Credits</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>5 Free Background Matting Credits</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>20 High-Resolution Vector QR Codes</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>1 GB Secure Cloud Storage</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>Max 25 MB file size limit</span>
+                  </div>
                 </div>
-                <p className="text-xs text-slate-600 mt-2">
-                  Unrestricted capability for professionals, businesses, and creators needing high volume and fast queues.
-                </p>
               </div>
 
-              <div className="pt-4 border-t border-slate-100 space-y-3 text-xs sm:text-sm text-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span className="font-bold text-slate-900">Priority Compute Processing Queue</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>75 Monthly AI Document Intelligence Credits</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>75 Monthly AI Background Matting Credits</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>500 Dynamic Custom QR Codes &amp; Analytics</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>25 GB Cloud Storage &amp; 30-Day File Retention</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>100 MB Max File Upload Limit</span>
-                </div>
-                <div className="flex items-center gap-2.5">
-                  <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
-                  <span>Unlimited PDF &amp; Document Format Conversions</span>
-                </div>
+              <div className="pt-8">
+                <Link
+                  href={isAuthenticated ? "/app" : "/signup"}
+                  className="w-full py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold rounded-xl text-sm transition flex items-center justify-center gap-2"
+                >
+                  <span>Start Free Workspace</span>
+                  <LuArrowRight className="w-4 h-4" />
+                </Link>
+                <p className="text-[11px] text-center text-slate-400 mt-2">
+                  No credit card required &bull; Instant activation
+                </p>
               </div>
             </div>
 
-            <div className="pt-8">
-              <Link
-                href="/app"
-                className="w-full py-3.5 bg-[#0066ff] hover:bg-blue-700 text-white font-extrabold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 active:scale-[0.98]"
-              >
-                <span>Upgrade to Pro — ₹299/mo</span>
-                <LuArrowRight className="w-4 h-4" />
-              </Link>
-              <p className="text-[11px] text-center text-slate-400 mt-2">
-                Instant activation &bull; Cancel anytime with 1 click
-              </p>
+            {/* Card 2: PRO STUDIO SUITE */}
+            <div className="p-8 rounded-3xl bg-white border-2 border-[#0066ff] shadow-xl flex flex-col justify-between relative overflow-hidden">
+              <div className="absolute top-4 right-4">
+                <span className="px-3 py-1 rounded-full bg-[#0066ff] text-white text-xs font-black uppercase tracking-wider">
+                  RECOMMENDED
+                </span>
+              </div>
+
+              <div className="space-y-6">
+                <div>
+                  <span className="text-xs font-mono uppercase tracking-wider text-[#0066ff] font-bold">
+                    PRO STUDIO SUITE
+                  </span>
+                  <div className="flex items-baseline gap-1 mt-2">
+                    <span className="text-5xl font-black text-slate-900 tracking-tight">
+                      ₹{billingCycle === "yearly" ? 208 : 299}
+                    </span>
+                    <span className="text-sm text-slate-500 font-medium">/ month</span>
+                  </div>
+                  <div className="text-xs text-[#0066ff] mt-1 font-mono font-semibold">
+                    {billingCycle === "yearly" ? "Billed annually at ₹2,499 / year" : "Billed monthly at ₹299"}
+                  </div>
+                  <p className="text-xs text-slate-600 mt-2">
+                    Unrestricted capability for professionals, businesses, and creators needing high volume and fast queues.
+                  </p>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100 space-y-3 text-xs sm:text-sm text-slate-800">
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span className="font-bold text-slate-900">Priority Compute Processing Queue</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>75 Monthly AI Document Intelligence Credits</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>75 Monthly AI Background Matting Credits</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>500 Dynamic Custom QR Codes &amp; Analytics</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>25 GB Cloud Storage &amp; 30-Day File Retention</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>100 MB Max File Upload Limit</span>
+                  </div>
+                  <div className="flex items-center gap-2.5">
+                    <LuCheck className="w-4 h-4 text-[#0066ff] shrink-0" />
+                    <span>Unlimited PDF &amp; Document Format Conversions</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-8">
+                <Link
+                  href="/app"
+                  className="w-full py-3.5 bg-[#0066ff] hover:bg-blue-700 text-white font-extrabold rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2 active:scale-[0.98]"
+                >
+                  <span>Upgrade to Pro — ₹299/mo</span>
+                  <LuArrowRight className="w-4 h-4" />
+                </Link>
+                <p className="text-[11px] text-center text-slate-400 mt-2">
+                  Instant activation &bull; Cancel anytime with 1 click
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -1685,7 +1707,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
           </p>
         </div>
 
-        {/* 3 Architecture Cards with illustrations */}
+        {/* Architecture cards use interface-style icon illustrations, not cropped screenshots. */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="p-7 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-sm hover:shadow-md transition flex flex-col justify-between">
             <div>
@@ -1697,10 +1719,24 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 Client-side WASM engine processes PDF restructuring, image compressions, and QR renderings right on your device for instant results.
               </p>
             </div>
-            <div className="mt-6 pt-6 border-t border-slate-100 flex items-center justify-center">
-              <span className="px-3 py-1 rounded-full bg-blue-50 text-[#0066ff] font-mono text-xs font-bold">
-                150ms WASM
-              </span>
+            <div aria-hidden="true" className="relative mt-6 flex h-36 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+              <div className="absolute h-28 w-28 rounded-full bg-blue-100/70 blur-2xl" />
+              <div className="relative flex -translate-x-5 -rotate-6 items-center gap-3 rounded-2xl border border-blue-100 bg-white/95 p-4 shadow-lg shadow-blue-900/10">
+                <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                  <LuFileText className="h-6 w-6" />
+                </span>
+                <span className="space-y-2">
+                  <span className="block h-2 w-24 rounded-full bg-slate-200" />
+                  <span className="block h-2 w-16 rounded-full bg-slate-100" />
+                  <span className="block h-2 w-20 rounded-full bg-slate-100" />
+                </span>
+              </div>
+              <div className="absolute right-[18%] top-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-indigo-100 bg-white text-indigo-600 shadow-md shadow-indigo-900/10">
+                <LuCpu className="h-6 w-6" />
+              </div>
+              <div className="absolute bottom-4 right-[22%] flex h-10 w-10 items-center justify-center rounded-full border border-amber-100 bg-white text-amber-500 shadow-md shadow-amber-900/10">
+                <LuZap className="h-5 w-5" />
+              </div>
             </div>
           </div>
 
@@ -1714,10 +1750,17 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 Your confidential documents and uploaded images are never stored or used to train third-party AI models. Scratch queues auto-purge within 24 hours.
               </p>
             </div>
-            <div className="mt-6 pt-6 border-t border-slate-100 flex items-center justify-center">
-              <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 font-mono text-xs font-bold">
-                Zero Data Retention
-              </span>
+            <div aria-hidden="true" className="relative mt-6 flex h-36 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-sky-50 via-white to-blue-50">
+              <div className="absolute h-28 w-28 rounded-full bg-sky-100/70 blur-2xl" />
+              <div className="relative -translate-x-6 -rotate-6 rounded-2xl border border-sky-100 bg-white p-3 shadow-lg shadow-blue-900/10">
+                <LuFileText className="h-12 w-12 text-sky-600" strokeWidth={1.7} />
+              </div>
+              <div className="relative z-10 -ml-4 translate-y-2 rounded-2xl border border-blue-100 bg-white p-3 shadow-lg shadow-blue-900/10">
+                <LuDatabase className="h-12 w-12 text-blue-600" strokeWidth={1.7} />
+              </div>
+              <div className="absolute bottom-4 right-[20%] flex h-11 w-11 items-center justify-center rounded-full border border-emerald-100 bg-white text-emerald-600 shadow-md shadow-emerald-900/10">
+                <LuShieldCheck className="h-6 w-6" />
+              </div>
             </div>
           </div>
 
@@ -1731,10 +1774,23 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
                 Send an output file from PDF Studio directly into AI Document Summarizer, or from Background Studio into Office Slide Builder with one click.
               </p>
             </div>
-            <div className="mt-6 pt-6 border-t border-slate-100 flex items-center justify-center">
-              <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-600 font-mono text-xs font-bold">
-                Cross-Studio Pipe
-              </span>
+            <div aria-hidden="true" className="relative mt-6 flex h-36 items-center justify-center overflow-hidden rounded-2xl bg-gradient-to-br from-violet-50 via-white to-orange-50">
+              <div className="absolute left-[22%] right-[22%] top-1/2 h-px -translate-y-1/2 bg-gradient-to-r from-blue-200 via-violet-300 to-orange-200" />
+              <div className="relative z-10 flex h-14 w-14 -translate-x-3 items-center justify-center rounded-2xl border border-blue-100 bg-white text-blue-600 shadow-md shadow-blue-900/10">
+                <LuFileText className="h-7 w-7" />
+              </div>
+              <div className="relative z-20 -mx-2 flex h-16 w-16 items-center justify-center rounded-2xl border border-violet-100 bg-white text-violet-600 shadow-lg shadow-violet-900/10">
+                <LuSparkles className="h-7 w-7" />
+              </div>
+              <div className="relative z-10 flex h-14 w-14 translate-x-3 items-center justify-center rounded-2xl border border-orange-100 bg-white text-orange-500 shadow-md shadow-orange-900/10">
+                <LuFileSpreadsheet className="h-7 w-7" />
+              </div>
+              <div className="absolute left-[31%] top-8 flex h-8 w-8 items-center justify-center rounded-full border border-blue-100 bg-white text-blue-500 shadow-sm">
+                <LuArrowRight className="h-4 w-4" />
+              </div>
+              <div className="absolute right-[29%] bottom-7 flex h-8 w-8 items-center justify-center rounded-full border border-violet-100 bg-white text-violet-500 shadow-sm">
+                <LuArrowRight className="h-4 w-4" />
+              </div>
             </div>
           </div>
         </div>
@@ -1849,161 +1905,7 @@ export function HomePageClient({ isAuthenticated = false }: HomePageClientProps)
         </div>
       </section>
 
-      {/* ================= SECTION 14: FOOTER ================= */}
-      <footer className="relative z-10 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="rounded-3xl border border-slate-200/90 bg-white p-8 sm:p-12 shadow-sm relative overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-10">
-            {/* Left Column: Logo & Newsletter */}
-            <div className="lg:col-span-6 space-y-4">
-              <Link href="/" className="inline-flex items-center group py-1">
-                <img
-                  src="/logo-full.webp"
-                  alt="XSWTOOLS - Every Tool. One Workspace."
-                  width={180}
-                  height={56}
-                  loading="lazy"
-                  className="h-12 sm:h-14 w-auto object-contain group-hover:opacity-95 transition-opacity"
-                />
-              </Link>
-
-              <p className="text-xs sm:text-sm text-slate-600 max-w-md">
-                Get the latest tools, AI features and guides delivered to your inbox.
-              </p>
-
-              {/* Newsletter Form */}
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  alert("Thank you for subscribing!");
-                }}
-                className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 max-w-md"
-              >
-                <input
-                  type="email"
-                  placeholder="Enter your email"
-                  aria-label="Email address for newsletter"
-                  required
-                  className="flex-1 px-4 py-2.5 rounded-full bg-slate-50 border border-slate-200 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-[#0066ff]"
-                />
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 rounded-full bg-[#1c1d22] hover:bg-black text-white text-xs font-bold transition shadow-xs text-center cursor-pointer"
-                >
-                  Subscribe
-                </button>
-              </form>
-            </div>
-
-            {/* Right Column: Links */}
-            <div className="lg:col-span-6 grid grid-cols-2 gap-8">
-              <div>
-                <h5 className="font-bold text-slate-900 text-xs uppercase tracking-wider mb-3">
-                  Navigation
-                </h5>
-                <ul className="space-y-2 text-xs text-slate-600">
-                  <li>
-                    <Link href="/" className="hover:text-[#0066ff] transition">
-                      Home
-                    </Link>
-                  </li>
-                  <li>
-                    <a href="#tools" className="hover:text-[#0066ff] transition">
-                      All Tools
-                    </a>
-                  </li>
-                  <li>
-                    <a href="#studios" className="hover:text-[#0066ff] transition">
-                      Studios
-                    </a>
-                  </li>
-                  <li>
-                    <Link href="/app/help" className="hover:text-[#0066ff] transition">
-                      Guides
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/contact" className="hover:text-[#0066ff] transition">
-                      Blog
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-
-              <div>
-                <h5 className="font-bold text-slate-900 text-xs uppercase tracking-wider mb-3">
-                  Tools
-                </h5>
-                <ul className="space-y-2 text-xs text-slate-600">
-                  <li>
-                    <Link href={getStudioHref("/app/studios/pdf")} className="hover:text-[#0066ff] transition">
-                      PDF Studio
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href={getStudioHref("/app/studios/ai-document")} className="hover:text-[#0066ff] transition">
-                      AI Tools
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href={getStudioHref("/app/studios/office")} className="hover:text-[#0066ff] transition">
-                      Productivity
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href={getStudioHref("/app/studios/security")} className="hover:text-[#0066ff] transition">
-                      Security
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href={getStudioHref("/app/studios/qr-link")} className="hover:text-[#0066ff] transition">
-                      QR &amp; Link Studio
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-            <div>&copy; 2026 XSPACEWEB Studio. All rights reserved.</div>
-
-            <div className="flex items-center gap-4">
-              <Link href="/privacy" className="hover:text-slate-900 transition">
-                Privacy Policy
-              </Link>
-              <span>•</span>
-              <Link href="/terms" className="hover:text-slate-900 transition">
-                Terms of Service
-              </Link>
-            </div>
-
-            {/* Social Icons */}
-            <div className="flex items-center gap-3 text-slate-600">
-              <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on YouTube" className="hover:text-red-600 transition p-1">
-                <FaYoutube className="w-4 h-4" />
-              </a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on LinkedIn" className="hover:text-blue-700 transition p-1">
-                <FaLinkedinIn className="w-4 h-4" />
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on X (formerly Twitter)" className="hover:text-slate-900 transition p-1">
-                <FaXTwitter className="w-4 h-4" />
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on Instagram" className="hover:text-pink-600 transition p-1">
-                <FaInstagram className="w-4 h-4" />
-              </a>
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="XSW Tools on Facebook" className="hover:text-blue-600 transition p-1">
-                <FaFacebookF className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
-
-          {/* Faint Watermark at bottom matching the PDF */}
-          <div className="pointer-events-none select-none text-center font-black text-6xl sm:text-8xl text-slate-900/[0.03] tracking-widest pt-6 uppercase">
-            XSWTOOLS
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

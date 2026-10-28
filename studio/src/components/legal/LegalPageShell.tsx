@@ -411,6 +411,11 @@ export function LegalPageShell({
                 </Link>
               </li>
               <li>
+                <Link href="/about" className="text-slate-600 hover:text-blue-600 transition">
+                  About Us
+                </Link>
+              </li>
+              <li>
                 <Link href="/contact" className="text-slate-600 hover:text-blue-600 transition">
                   Contact Us
                 </Link>
